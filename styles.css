@@ -2054,6 +2054,7 @@ html.pomodoro-focus-open { overflow: hidden; }
 .mutual-card:hover,.mutual-card:focus-visible{border-color:#7652b6;box-shadow:0 10px 24px rgba(55,35,90,.1);transform:translateY(-3px)}
 .mutual-card:active{transform:translateY(-1px)}
 .mutual-card-art,.mutual-detail-art{display:grid;place-items:center;min-height:156px;margin:0;border-radius:27px 27px 20px 20px;background:#eee8f7;border-bottom:3px solid rgba(118,82,182,.18)}
+.mutual-card-art img,.mutual-detail-art img{display:none}
 .mutual-card-art span,.mutual-detail-art span{font-size:74px;line-height:1;filter:saturate(.86)}
 .mutual-card-body{display:grid;gap:9px;padding:20px 22px 23px;min-width:0}
 .mutual-card-kicker{color:#7652b6;font-size:17px;font-weight:800}
@@ -2649,6 +2650,14 @@ html.pomodoro-focus-open { overflow: hidden; }
   .learning-plan-card p,
   .learning-note-card p { font-size: 16px; }
   .mutual-card-art { min-height: 120px; margin: -17px -17px 0; border-radius: 20px 20px 14px 14px; }
+  .mutual-card-art,
+  .mutual-detail-art { position: relative; display: block; overflow: hidden; padding: 0; }
+  .mutual-card-art { min-height: 0; aspect-ratio: 16 / 9; }
+  .mutual-detail-art { min-height: 0; aspect-ratio: 16 / 9; }
+  .mutual-card-art img,
+  .mutual-detail-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .mutual-card-art span,
+  .mutual-detail-art span { display: none; }
   .mutual-card-body { padding: 16px 0 0; }
   .mutual-detail-info,
   .is-ride-detail .mutual-detail-info { grid-template-columns: 1fr; }
