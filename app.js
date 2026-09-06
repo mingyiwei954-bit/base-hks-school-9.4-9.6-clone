@@ -683,6 +683,7 @@ function runMobileTabAction(button, event, action) {
 let mobilePageTransitionToken = 0;
 let mobilePageSwapTimer = 0;
 let mobilePageCleanupTimer = 0;
+let mobilePrimaryPageAnimation = null;
 
 function commitMobilePageChange(action) {
   action();
@@ -701,6 +702,8 @@ function runMobilePageTransition(action) {
   }
 
   const token = ++mobilePageTransitionToken;
+  mobilePrimaryPageAnimation?.cancel();
+  mobilePrimaryPageAnimation = null;
   window.clearTimeout(mobilePageSwapTimer);
   window.clearTimeout(mobilePageCleanupTimer);
   resultItems.classList.remove('is-stage-entering');
@@ -717,8 +720,37 @@ function runMobilePageTransition(action) {
   }, 72);
 }
 
+function runMobilePrimaryPageTransition(action) {
+  if (!mobileSearchMedia.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches || resultItems.hidden) {
+    if (mobileSearchMedia.matches) commitMobilePageChange(action);
+    else action();
+    return;
+  }
+
+  const token = ++mobilePageTransitionToken;
+  window.clearTimeout(mobilePageSwapTimer);
+  window.clearTimeout(mobilePageCleanupTimer);
+  resultItems.classList.remove('is-stage-leaving', 'is-stage-entering');
+  mobilePrimaryPageAnimation?.cancel();
+  commitMobilePageChange(action);
+
+  mobilePrimaryPageAnimation = resultItems.animate([
+    { opacity: .94, transform: 'translate3d(0, 4px, 0) scale(.994)' },
+    { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+  ], {
+    duration: 190,
+    easing: 'cubic-bezier(.22,.8,.3,1)',
+    fill: 'both',
+  });
+  mobilePrimaryPageAnimation.onfinish = () => {
+    if (token !== mobilePageTransitionToken) return;
+    mobilePrimaryPageAnimation.cancel();
+    mobilePrimaryPageAnimation = null;
+  };
+}
+
 verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
-  button.addEventListener('click', (event) => runMobileTabAction(button, event, () => runMobilePageTransition(() => selectVertical(button))));
+  button.addEventListener('click', (event) => runMobileTabAction(button, event, () => runMobilePrimaryPageTransition(() => selectVertical(button))));
   button.addEventListener('keydown', (event) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
