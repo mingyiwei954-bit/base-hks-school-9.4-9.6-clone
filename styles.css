@@ -2001,6 +2001,17 @@ html.pomodoro-focus-open { overflow: hidden; }
   .serp-stage:has(> .support-drawer.is-visible:focus-within) {
     padding-left: calc(var(--section-sidebar-width) + var(--section-sidebar-content-gap));
   }
+  .serp-stage:has(> .support-drawer:not(.is-visible)) {
+    box-sizing: border-box;
+    width: calc(100% + var(--section-sidebar-width));
+    max-width: none;
+    margin-left: calc(-1 * var(--section-sidebar-width));
+    padding-left: 24px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .serp-stage:has(> .support-drawer:not(.is-visible)) { padding-left: 16px; }
 }
 
 @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
