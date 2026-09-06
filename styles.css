@@ -2183,10 +2183,8 @@ html.pomodoro-focus-open { overflow: hidden; }
     --mobile-card-radius: 22px;
   }
 
-  html,
-  body { width: 100%; max-width: 100%; overflow-x: hidden; }
-  html { overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
-  body { min-width: 0; }
+  html { width: 100%; max-width: 100%; overflow-x: hidden; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
+  body { width: 100%; max-width: 100%; min-width: 0; overflow-x: clip; overflow-y: visible; }
   .canvas { width: 100%; min-width: 0; }
 
   /* 顶部只保留四个一级栏目；原桌面品牌栏与侧栏仍在 DOM 中。 */

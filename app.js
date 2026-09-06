@@ -70,14 +70,6 @@ let scrollFrame = 0;
 const topRail = document.querySelector('.top-rail');
 const mobileSearchMedia = window.matchMedia('(max-width: 767px)');
 
-const mobileNestedScrollAreas = '.points-card,.mutual-detail-card,.learning-detail-card,.learning-editor-card,.resource-detail-card,.course-notes-card,.campus-map-preview-card,.login-card,.pomodoro-card,.pomodoro-scroll,.pomodoro-focus-view,.post-detail-content';
-document.addEventListener('wheel', (event) => {
-  if (!mobileSearchMedia.matches || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-  if (event.target instanceof Element && event.target.closest(mobileNestedScrollAreas)) return;
-  event.preventDefault();
-  window.scrollBy({ top: event.deltaY * 1.35, left: 0, behavior: 'auto' });
-}, { passive: false, capture: true });
-
 function syncCondensedNavigation() {
   const condensed = !mobileSearchMedia.matches && Boolean(topRail?.classList.contains('is-scrolled'));
   canvas?.classList.toggle('is-nav-condensed', condensed);
