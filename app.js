@@ -1945,3 +1945,37 @@ setDrawerPreset('综合');
 const initialSidebarItem = getRememberedSidebarItem('综合', '综合');
 renderSupportResult(initialSidebarItem);
 renderMobileSubnav('综合');
+
+// Desktop page switches always begin at the document top. The reset runs after
+// the synchronous render so it does not interfere with the existing entry motion.
+const desktopTabScrollResetMedia = window.matchMedia('(min-width: 768px)');
+let desktopTabScrollResetFrame = 0;
+
+function scheduleDesktopTabScrollReset() {
+  if (!desktopTabScrollResetMedia.matches) return;
+  cancelAnimationFrame(desktopTabScrollResetFrame);
+  desktopTabScrollResetFrame = requestAnimationFrame(() => {
+    const scrollingElement = document.scrollingElement;
+    if (scrollingElement) {
+      scrollingElement.scrollLeft = 0;
+      scrollingElement.scrollTop = 0;
+    }
+    desktopTabScrollResetFrame = 0;
+  });
+}
+
+verticalsTrack.addEventListener('click', (event) => {
+  const tab = event.target.closest('[data-vertical]');
+  if (!tab || tab.classList.contains('is-active')) return;
+  scheduleDesktopTabScrollReset();
+}, { capture: true });
+
+verticalsTrack.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') scheduleDesktopTabScrollReset();
+}, { capture: true });
+
+supportDrawer.addEventListener('click', (event) => {
+  const tab = event.target.closest('[data-support]');
+  if (!tab || tab.classList.contains('is-active')) return;
+  scheduleDesktopTabScrollReset();
+}, { capture: true });
