@@ -644,8 +644,44 @@ function selectVertical(button) {
   verticalsTrack.scrollTo({ left: targetLeft, behavior: 'smooth' });
 }
 
+const mobileTabAnimationTimers = new WeakMap();
+
+function runMobileTabAction(button, event, action) {
+  if (!mobileSearchMedia.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    action();
+    return;
+  }
+
+  const tablist = button.closest('[role="tablist"]');
+  if (!tablist) {
+    action();
+    return;
+  }
+
+  window.clearTimeout(mobileTabAnimationTimers.get(tablist));
+  tablist.querySelectorAll('.is-tab-pressing').forEach((tab) => tab.classList.remove('is-tab-pressing'));
+  button.querySelectorAll('.mobile-tab-ripple').forEach((ripple) => ripple.remove());
+
+  const bounds = button.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const hasPointerPosition = Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY) && (event.clientX || event.clientY);
+  ripple.className = 'mobile-tab-ripple';
+  ripple.style.setProperty('--tab-ripple-x', `${hasPointerPosition ? event.clientX - bounds.left : bounds.width / 2}px`);
+  ripple.style.setProperty('--tab-ripple-y', `${hasPointerPosition ? event.clientY - bounds.top : bounds.height / 2}px`);
+  ripple.style.setProperty('--tab-ripple-size', `${Math.max(bounds.width, bounds.height) * 1.8}px`);
+  button.append(ripple);
+  button.classList.add('is-tab-pressing');
+
+  const timer = window.setTimeout(() => {
+    button.classList.remove('is-tab-pressing');
+    action();
+  }, 100);
+  mobileTabAnimationTimers.set(tablist, timer);
+  window.setTimeout(() => ripple.remove(), 520);
+}
+
 verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
-  button.addEventListener('click', () => selectVertical(button));
+  button.addEventListener('click', (event) => runMobileTabAction(button, event, () => selectVertical(button)));
   button.addEventListener('keydown', (event) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
@@ -816,17 +852,19 @@ if (mobileSubnavTrack) setupMobileSubnavDrag(mobileSubnavTrack);
 mobileSubnavTrack?.addEventListener('click', (event) => {
   const button = event.target.closest('[data-mobile-section]');
   if (!button) return;
-  const value = button.dataset.mobileSection;
-  if (activeVertical === '工具箱') {
-    toolboxActiveTab = value;
-    sidebarState.工具箱 = value;
-    saveSidebarState();
-    renderToolbox();
-  } else {
-    sidebarState[activeVertical] = value;
-    saveSidebarState();
-    renderSupportResult(value);
-  }
+  runMobileTabAction(button, event, () => {
+    const value = button.dataset.mobileSection;
+    if (activeVertical === '工具箱') {
+      toolboxActiveTab = value;
+      sidebarState.工具箱 = value;
+      saveSidebarState();
+      renderToolbox();
+    } else {
+      sidebarState[activeVertical] = value;
+      saveSidebarState();
+      renderSupportResult(value);
+    }
+  });
 });
 
 mobileSubnavTrack?.addEventListener('keydown', (event) => {
