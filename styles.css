@@ -2827,11 +2827,27 @@ html.pomodoro-focus-open { overflow: hidden; }
     transition: top 280ms var(--ease), transform 280ms var(--ease), opacity 220ms ease;
   }
   .canvas .verticals-shell {
-    transition: top 300ms var(--ease), width 300ms var(--ease), transform 300ms var(--ease);
+    --desktop-verticals-width: min(1120px, calc(100vw - 48px));
+    top: 96px;
+    width: var(--desktop-verticals-width);
+    margin-left: calc((100vw - var(--desktop-verticals-width)) / 2 - var(--section-sidebar-width));
+    margin-right: 0;
+    border-radius: 26px;
+    transform: none;
+    transition: top 300ms var(--ease), width 300ms var(--ease), margin-left 300ms var(--ease);
   }
   .canvas .verticals-track {
-    transition: background 260ms ease, border-color 260ms ease, border-radius 280ms var(--ease), box-shadow 260ms ease, backdrop-filter 260ms ease;
+    overflow-y: hidden;
+    border-radius: 26px;
+    box-shadow: 0 8px 18px rgba(55, 35, 90, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78), inset 0 -1px 0 rgba(91, 72, 132, 0.08);
+    transition: background 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
   }
+  .canvas .verticals-track:hover {
+    box-shadow: 0 10px 22px rgba(55, 35, 90, 0.11), inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 -1px 0 rgba(91, 72, 132, 0.1);
+  }
+  .canvas .verticals-track::before { animation: none; }
+  .canvas .verticals-shell::before { border-radius: 26px 0 0 26px; }
+  .canvas .verticals-shell::after { border-radius: 0 26px 26px 0; }
   .canvas.is-nav-condensed .top-rail {
     top: 8px;
     left: 20px;
@@ -2840,8 +2856,8 @@ html.pomodoro-focus-open { overflow: hidden; }
     border-radius: 22px;
     pointer-events: auto;
     background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(247,242,255,.25) 48%, rgba(220,239,230,.3)) !important;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(4px) saturate(145%);
+    -webkit-backdrop-filter: blur(4px) saturate(145%);
   }
   .canvas.is-nav-condensed .discovery-layer { z-index: auto; }
   .canvas.is-nav-condensed .top-rail::before { border-radius: 21px; }
@@ -2858,20 +2874,22 @@ html.pomodoro-focus-open { overflow: hidden; }
   .canvas.is-nav-condensed .top-rail .login-trigger { height: 42px; }
   .canvas.is-nav-condensed .top-rail .account-menu { top: 52px; }
   .canvas.is-nav-condensed .verticals-shell {
+    --desktop-verticals-width: min(720px, calc(100vw - 320px));
     top: 16px;
     z-index: 31;
-    width: min(720px, calc(100vw - 320px));
-    transform: translateX(-98px);
+    width: var(--desktop-verticals-width);
+    margin-left: calc((100vw - var(--desktop-verticals-width)) / 2 - var(--section-sidebar-width));
+    transform: none;
   }
   .canvas.is-nav-condensed .verticals-track {
     height: 48px;
     padding-inline: 12px;
     border-color: transparent;
-    border-radius: 18px;
+    border-radius: 26px;
     background: linear-gradient(112deg, rgba(255,255,255,.2), rgba(247,242,255,.08) 54%, rgba(220,239,230,.14)) !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.44);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    box-shadow: 0 5px 14px rgba(55, 35, 90, 0.07), inset 0 1px 0 rgba(255,255,255,.52);
+    backdrop-filter: blur(4px) saturate(145%);
+    -webkit-backdrop-filter: blur(4px) saturate(145%);
   }
   .canvas.is-nav-condensed .verticals-track::after {
     inset: 3px;

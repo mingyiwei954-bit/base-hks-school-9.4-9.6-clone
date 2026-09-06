@@ -69,6 +69,8 @@ let lastScrollY = window.scrollY;
 let scrollFrame = 0;
 const topRail = document.querySelector('.top-rail');
 const mobileSearchMedia = window.matchMedia('(max-width: 767px)');
+const desktopNavCollapseY = 96;
+const desktopNavRestoreY = 40;
 
 function syncCondensedNavigation() {
   const condensed = !mobileSearchMedia.matches && Boolean(topRail?.classList.contains('is-scrolled'));
@@ -306,8 +308,9 @@ window.addEventListener('scroll', () => {
   if (scrollFrame) return;
   scrollFrame = window.requestAnimationFrame(() => {
     const currentY = window.scrollY;
-    const shouldCollapse = currentY > lastScrollY && currentY > 8;
-    const shouldRestore = currentY <= 64;
+    const isDesktop = !mobileSearchMedia.matches;
+    const shouldCollapse = isDesktop ? currentY >= desktopNavCollapseY : currentY > lastScrollY && currentY > 8;
+    const shouldRestore = isDesktop ? currentY <= desktopNavRestoreY : currentY <= 64;
     if (shouldCollapse && !topRail?.classList.contains('is-scrolled')) topRail?.classList.add('is-scrolled');
     else if (shouldRestore && topRail?.classList.contains('is-scrolled')) topRail?.classList.remove('is-scrolled');
     syncCondensedNavigation();
