@@ -810,19 +810,19 @@ const drawerIcons = {
 
 const mutualCardData = {
   失物回家: [
-    { icon: '☂', tone: 'lost-umbrella', title: '黑色长柄雨伞', place: '明德楼一层门厅', time: '今天 08:40', status: '失物', description: '伞柄上有一圈浅灰色胶带，最后一次使用是在早课前。', contact: '李同学 · 站内联系', action: '联系失主' },
-    { icon: '📚', tone: 'lost-books', title: '蓝色帆布书袋', place: '图书馆三层靠窗区', time: '昨天 19:10', status: '失物', description: '袋内有两本专业课教材和一只银色签字笔，已交到图书馆服务台。', contact: '周同学 · 图书馆服务台', action: '联系失主' },
-    { icon: '🎧', tone: 'lost-headphones', title: '白色无线耳机盒', place: '世纪馆报告厅外', time: '9 月 16 日 16:30', status: '寻物', description: '透明保护壳上贴着一颗小树贴纸，希望有拾到的同学帮忙留意。', contact: '陈同学 · 站内联系', action: '联系发布者' },
+    { image: './assets/mutual/lost-umbrella.webp', imageAlt: '雨滴落在黑色长柄雨伞的伞面上', tone: 'lost-umbrella', title: '黑色长柄雨伞', place: '明德楼一层门厅', time: '今天 08:40', status: '失物', description: '伞柄上有一圈浅灰色胶带，最后一次使用是在早课前。', contact: '李同学 · 站内联系', action: '联系失主' },
+    { image: './assets/mutual/lost-book-bag.webp', imageAlt: '深蓝与米白拼色的帆布书袋', tone: 'lost-books', title: '蓝色帆布书袋', place: '图书馆三层靠窗区', time: '昨天 19:10', status: '失物', description: '袋内有两本专业课教材和一只银色签字笔，已交到图书馆服务台。', contact: '周同学 · 图书馆服务台', action: '联系失主' },
+    { image: './assets/mutual/lost-earbuds.webp', imageAlt: '木桌上的白色无线耳机盒', tone: 'lost-headphones', title: '白色无线耳机盒', place: '世纪馆报告厅外', time: '9 月 16 日 16:30', status: '寻物', description: '透明保护壳上贴着一颗小树贴纸，希望有拾到的同学帮忙留意。', contact: '陈同学 · 站内联系', action: '联系发布者' },
   ],
   闲置流转: [
-    { icon: '🪑', tone: 'idle-chair', title: '宿舍折叠椅', price: '25 元', condition: '九成新', place: '品园一舍附近', time: '今天 10:15', description: '靠背和坐垫都保持良好，毕业离校前转出，支持现场查看。', contact: '王同学 · 站内联系', action: '联系发布者' },
-    { icon: '📖', tone: 'idle-books', title: '考研英语资料一套', price: '免费', condition: '八成新', place: '北区食堂门口', time: '昨天 21:00', description: '包含单词书、真题册和笔记，适合刚开始准备英语复习的同学。', contact: '赵同学 · 可约取件', action: '联系发布者' },
-    { icon: '🖥️', tone: 'idle-monitor', title: '24 英寸显示器', price: '180 元', condition: '九成新', place: '知行楼一层', time: '9 月 15 日', description: '1080p 分辨率，接口齐全，已恢复出厂设置，可现场通电检查。', contact: '高同学 · 站内联系', action: '联系发布者' },
+    { image: './assets/mutual/idle-chair.webp', imageAlt: '放着书本的木质折叠椅', tone: 'idle-chair', title: '宿舍折叠椅', price: '25 元', condition: '九成新', place: '品园一舍附近', time: '今天 10:15', description: '靠背和坐垫都保持良好，毕业离校前转出，支持现场查看。', contact: '王同学 · 站内联系', action: '联系发布者' },
+    { image: './assets/mutual/idle-study-books.webp', imageAlt: '书桌上的英语学习资料和笔记本电脑', tone: 'idle-books', title: '考研英语资料一套', price: '免费', condition: '八成新', place: '北区食堂门口', time: '昨天 21:00', description: '包含单词书、真题册和笔记，适合刚开始准备英语复习的同学。', contact: '赵同学 · 可约取件', action: '联系发布者' },
+    { image: './assets/mutual/idle-monitor.webp', imageAlt: '书桌上的 24 英寸显示器', tone: 'idle-monitor', title: '24 英寸显示器', price: '180 元', condition: '九成新', place: '知行楼一层', time: '9 月 15 日', description: '1080p 分辨率，接口齐全，已恢复出厂设置，可现场通电检查。', contact: '高同学 · 站内联系', action: '联系发布者' },
   ],
   拼行组队: [
-    { icon: '🚄', tone: 'ride-train', title: '周末回济南，找两位同行', from: '中国人民大学', to: '济南西站', departure: '9 月 20 日 周六 13:30', remaining: '还差 2 人', transport: '高铁 · 费用 AA', contact: '许同学', description: '计划从学校一起出发到北京南站，路上可以互相照应。' },
-    { icon: '🚕', tone: 'ride-taxi', title: '机场线拼车，周一早上出发', from: '海淀校区东门', to: '首都机场 T3', departure: '9 月 22 日 周一 06:20', remaining: '还差 1 人', transport: '网约车 · 预计 35 元/人', contact: '林同学', description: '已预约 6 座车，途经中关村和望京，行李较多的同学优先。' },
-    { icon: '🚲', tone: 'ride-bike', title: '校园东区到西区，一起骑行', from: '品园南门', to: '世纪馆广场', departure: '今天 17:40', remaining: '还差 3 人', transport: '自行车 · 无费用', contact: '苏同学', description: '下课后顺路同行，节奏较慢，预计 20 分钟到达。' },
+    { image: './assets/mutual/ride-train.webp', imageAlt: '高铁列车停靠在车站站台', tone: 'ride-train', title: '周末回济南，找两位同行', from: '中国人民大学', to: '济南西站', departure: '9 月 20 日 周六 13:30', remaining: '还差 2 人', transport: '高铁 · 费用 AA', contact: '许同学', description: '计划从学校一起出发到北京南站，路上可以互相照应。' },
+    { image: './assets/mutual/ride-airport-taxi.webp', imageAlt: '机场出发层等候乘客的出租车', tone: 'ride-taxi', title: '机场线拼车，周一早上出发', from: '海淀校区东门', to: '首都机场 T3', departure: '9 月 22 日 周一 06:20', remaining: '还差 1 人', transport: '网约车 · 预计 35 元/人', contact: '林同学', description: '已预约 6 座车，途经中关村和望京，行李较多的同学优先。' },
+    { image: './assets/mutual/ride-campus-bike.webp', imageAlt: '大学校园道路上的骑行学生', tone: 'ride-bike', title: '校园东区到西区，一起骑行', from: '品园南门', to: '世纪馆广场', departure: '今天 17:40', remaining: '还差 3 人', transport: '自行车 · 无费用', contact: '苏同学', description: '下课后顺路同行，节奏较慢，预计 20 分钟到达。' },
   ],
 };
 
@@ -842,7 +842,7 @@ function openMutualDetail(item, category) {
   const info = isRide
     ? `<div class="mutual-detail-info"><span>出发地<b>${item.from}</b></span><span>目的地<b>${item.to}</b></span><span>出发时间<b>${item.departure}</b></span><span>队伍状态<b>${item.remaining}</b></span></div>`
     : `<div class="mutual-detail-info"><span>${isLost ? '地点' : '价格'}<b>${isLost ? item.place : item.price}</b></span><span>${isLost ? '发现时间' : '物品成色'}<b>${isLost ? item.time : item.condition}</b></span><span>${isLost ? '状态' : '交易地点'}<b>${isLost ? item.status : item.place}</b></span></div>`;
-  layer.innerHTML = `<article class="mutual-detail-card ${isRide ? 'is-ride-detail' : ''}"><button class="mutual-detail-close" type="button" aria-label="关闭详情">×</button><span class="mutual-detail-eyebrow">${category} · 详情</span><div class="mutual-detail-art mutual-art-${item.tone}" aria-hidden="true"><span>${item.icon}</span></div><h2>${item.title}</h2>${info}<p>${item.description}</p><div class="mutual-detail-contact"><span>发起人 / 联系方式</span><b>${item.contact}</b></div><div class="mutual-detail-actions"><button class="mutual-detail-primary" type="button">${isRide ? '加入组队' : item.action}</button><button class="mutual-detail-secondary" type="button">☆ 收藏</button></div></article>`;
+  layer.innerHTML = `<article class="mutual-detail-card ${isRide ? 'is-ride-detail' : ''}"><button class="mutual-detail-close" type="button" aria-label="关闭详情">×</button><span class="mutual-detail-eyebrow">${category} · 详情</span><div class="mutual-detail-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" decoding="async" /></div><h2>${item.title}</h2>${info}<p>${item.description}</p><div class="mutual-detail-contact"><span>发起人 / 联系方式</span><b>${item.contact}</b></div><div class="mutual-detail-actions"><button class="mutual-detail-primary" type="button">${isRide ? '加入组队' : item.action}</button><button class="mutual-detail-secondary" type="button">☆ 收藏</button></div></article>`;
   resultItems.append(layer);
   const close = () => closeMutualDetail();
   layer.querySelector('.mutual-detail-close').addEventListener('click', close);
@@ -855,7 +855,7 @@ function openMutualDetail(item, category) {
 function renderMutualCards(category) {
   const items = mutualCardData[category] || [];
   const isRide = category === '拼行组队';
-  resultItems.innerHTML = `<section class="mutual-cards-page ${isRide ? 'is-ride-page' : ''}" aria-label="${category}"><header class="mutual-cards-head"><span class="campus-eyebrow">${category}</span><h2>${category}</h2><p>${isRide ? '把出发时间和同行信息说清楚，轻松找到顺路伙伴。' : category === '失物回家' ? '让遗失的物品回到主人手里。' : '把暂时不用的物品留给真正需要的人。'}</p></header><div class="mutual-card-grid">${items.map((item) => `<article class="mutual-card ${isRide ? 'is-ride-card' : ''}" tabindex="0" data-mutual-card="${items.indexOf(item)}"><div class="mutual-card-art mutual-art-${item.tone}" aria-label="${item.title}插画"><span>${item.icon}</span></div><div class="mutual-card-body"><div class="mutual-card-kicker">${isRide ? item.remaining : item.status || item.condition}</div><h3>${item.title}</h3>${isRide ? `<div class="mutual-route"><span>${item.from}</span><b>→</b><span>${item.to}</span></div><p>${item.departure}</p><div class="mutual-card-meta"><span>${item.transport}</span><span>${item.contact}</span></div>` : `<p>${item.place}</p><div class="mutual-card-meta"><span>${item.time || item.price}</span><span>${item.condition || item.status}</span></div>`}</div></article>`).join('')}</div></section>`;
+  resultItems.innerHTML = `<section class="mutual-cards-page ${isRide ? 'is-ride-page' : ''}" aria-label="${category}"><header class="mutual-cards-head"><span class="campus-eyebrow">${category}</span><h2>${category}</h2><p>${isRide ? '把出发时间和同行信息说清楚，轻松找到顺路伙伴。' : category === '失物回家' ? '让遗失的物品回到主人手里。' : '把暂时不用的物品留给真正需要的人。'}</p></header><div class="mutual-card-grid">${items.map((item, index) => `<article class="mutual-card ${isRide ? 'is-ride-card' : ''}" tabindex="0" data-mutual-card="${index}"><div class="mutual-card-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" loading="lazy" decoding="async" /></div><div class="mutual-card-body"><div class="mutual-card-kicker">${isRide ? item.remaining : item.status || item.condition}</div><h3>${item.title}</h3>${isRide ? `<div class="mutual-route"><span>${item.from}</span><b>→</b><span>${item.to}</span></div><p>${item.departure}</p><div class="mutual-card-meta"><span>${item.transport}</span><span>${item.contact}</span></div>` : `<p>${item.place}</p><div class="mutual-card-meta"><span>${item.time || item.price}</span><span>${item.condition || item.status}</span></div>`}</div></article>`).join('')}</div></section>`;
   resultItems.hidden = false;
   resultItems.querySelectorAll('[data-mutual-card]').forEach((card) => {
     const item = items[Number(card.dataset.mutualCard)];

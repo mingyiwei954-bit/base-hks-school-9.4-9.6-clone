@@ -2093,8 +2093,8 @@ html.pomodoro-focus-open { overflow: hidden; }
 .mutual-card{min-width:0;display:flex;flex-direction:column;border:4px solid rgba(118,82,182,.48);border-radius:32px;background:rgba(255,254,250,.58);cursor:pointer;transition:border-color 180ms ease,box-shadow 180ms ease,transform 180ms ease;outline:none}
 .mutual-card:hover,.mutual-card:focus-visible{border-color:#7652b6;box-shadow:0 10px 24px rgba(55,35,90,.1);transform:translateY(-3px)}
 .mutual-card:active{transform:translateY(-1px)}
-.mutual-card-art,.mutual-detail-art{display:grid;place-items:center;min-height:156px;margin:0;border-radius:27px 27px 20px 20px;background:#eee8f7;border-bottom:3px solid rgba(118,82,182,.18)}
-.mutual-card-art span,.mutual-detail-art span{font-size:74px;line-height:1;filter:saturate(.86)}
+.mutual-card-art,.mutual-detail-art{position:relative;display:grid;place-items:center;min-height:156px;margin:0;overflow:hidden;border-radius:27px 27px 20px 20px;background:#eee8f7;border-bottom:3px solid rgba(118,82,182,.18)}
+.mutual-card-art img,.mutual-detail-art img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
 .mutual-card-body{display:grid;gap:9px;padding:20px 22px 23px;min-width:0}
 .mutual-card-kicker{color:#7652b6;font-size:17px;font-weight:800}
 .mutual-card h3{margin:0;color:var(--ink);font-size:26px;line-height:1.35;overflow-wrap:anywhere}
@@ -2116,7 +2116,6 @@ html.pomodoro-focus-open { overflow: hidden; }
 .mutual-detail-close:hover,.mutual-detail-close:focus-visible{color:#7652b6;background:rgba(118,82,182,.1);outline:none}
 .mutual-detail-eyebrow{display:block;margin-bottom:12px;color:#7652b6;font-size:18px;font-weight:800;letter-spacing:.05em}
 .mutual-detail-art{min-height:130px;border-radius:22px;margin-bottom:20px}
-.mutual-detail-art span{font-size:62px}
 .mutual-detail-card h2{margin:0 45px 18px 0;color:var(--ink);font-size:30px;line-height:1.35;overflow-wrap:anywhere}
 .mutual-detail-info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
 .is-ride-detail .mutual-detail-info{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -2135,6 +2134,17 @@ html.pomodoro-focus-open { overflow: hidden; }
 @keyframes mutual-detail-fade{from{opacity:0}to{opacity:1}}
 @keyframes mutual-detail-pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){.mutual-detail-layer,.mutual-detail-card{animation:none}.mutual-card{transition:none}}
+@media(min-width:768px){
+  .mutual-card{overflow:hidden}
+  .mutual-card-art{aspect-ratio:16/9;min-height:182px;border-radius:27px 27px 18px 18px}
+  .mutual-detail-art{aspect-ratio:16/8;min-height:220px}
+  .mutual-art-lost-books img,.mutual-art-lost-headphones img,.mutual-art-idle-monitor img{object-fit:contain}
+  .mutual-art-lost-books{background:#171313}
+  .mutual-art-lost-headphones{background:#d7d7d7}
+  .mutual-art-idle-monitor{background:#e5ddd3}
+  .mutual-card:hover .mutual-card-art img,.mutual-card:focus-visible .mutual-card-art img{transform:scale(1.018)}
+  .mutual-card-art img{transition:transform 240ms cubic-bezier(.2,.75,.25,1)}
+}
 @media(max-width:1023px){.mutual-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:767px){.mutual-cards-page{padding-bottom:30px}.mutual-card-grid{grid-template-columns:1fr;gap:16px}.mutual-card{border-radius:26px}.mutual-card-art{min-height:138px;border-radius:21px 21px 16px 16px}.mutual-card-body{padding:18px 19px 20px}.mutual-card h3{font-size:24px}.mutual-card p{font-size:18px}.mutual-detail-layer{padding:16px}.mutual-detail-card{padding:24px 20px;border-radius:26px}.mutual-detail-info,.is-ride-detail .mutual-detail-info{grid-template-columns:1fr 1fr}.mutual-detail-card h2{font-size:27px}.mutual-detail-card>p{font-size:18px}.mutual-detail-actions{justify-content:stretch}.mutual-detail-actions button{flex:1;min-width:130px}}
 
