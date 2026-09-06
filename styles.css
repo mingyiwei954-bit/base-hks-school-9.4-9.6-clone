@@ -3021,3 +3021,92 @@ html.pomodoro-focus-open { overflow: hidden; }
   from { opacity: .9; transform: translate3d(0, 4px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
+
+/* 手机卡片纵向收紧，并让浏览器原生判断顶部 Tab 的横滑与页面纵滑。 */
+@media (max-width: 767px) {
+  .mobile-subnav-track { touch-action: pan-x pan-y; }
+
+  .canvas .result-items { will-change: auto; }
+  .canvas .result-items.is-stage-leaving,
+  .canvas .result-items.is-stage-entering { will-change: opacity, transform; }
+
+  .canvas .result-item,
+  .thread-item,
+  .interest-card,
+  .learning-card,
+  .campus-feature,
+  .campus-small,
+  .campus-recap,
+  .radar-feed,
+  .radar-feed-item,
+  .aggregate-grid article,
+  .course-card,
+  .resource-card,
+  .mutual-card,
+  .learning-plan-card,
+  .learning-note-card,
+  .learning-overview-card,
+  .tool-card,
+  .profile-page,
+  .profile-feature,
+  .profile-post { touch-action: pan-y; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+  .canvas .result-item { margin-bottom: 10px; padding: 14px; border-radius: 20px; }
+  .canvas .result-item .author-rail {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 1px 9px;
+    margin-bottom: 10px;
+    padding-bottom: 9px;
+  }
+  .canvas .result-item .avatar { width: 38px; height: 38px; }
+  .canvas .result-item .display-name { font-size: 15px; }
+  .canvas .result-item .user-badge { font-size: 12px; }
+  .canvas .result-item .result-header { font-size: 19px; line-height: 1.34; }
+  .canvas .result-item .result-summary { margin-top: 6px; font-size: 15px; line-height: 1.52; }
+  .canvas .result-item .result-tags { gap: 5px; margin-top: 8px; }
+  .canvas .result-item .result-tags span { padding: 4px 8px; font-size: 12px; }
+  .canvas .result-item .result-meta { gap: 5px 11px; margin-top: 9px; font-size: 12px; }
+  .canvas .result-item.is-expanded .result-detail { padding-top: 13px; }
+
+  .campus-feature { grid-template-rows: 148px auto; }
+  .campus-thumb,
+  .recap-collage { min-height: 122px; }
+  .campus-feature-copy { padding: 14px 16px 13px; }
+  .campus-small,
+  .campus-recap { gap: 9px; padding-bottom: 12px; }
+  .campus-small > div:last-child,
+  .campus-recap > div:last-child { padding-inline: 13px; }
+  .radar-feed,
+  .thread-item,
+  .aggregate-grid article { padding: 14px; }
+  .thread-item { margin-bottom: 9px; }
+
+  .interest-card,
+  .learning-card { margin-bottom: 12px; }
+  .interest-image,
+  .interest-card.is-tall .interest-image,
+  .learning-card-image,
+  .learning-card:nth-child(4n + 1) .learning-card-image,
+  .learning-card:nth-child(4n + 2) .learning-card-image,
+  .learning-card:nth-child(4n + 3) .learning-card-image { aspect-ratio: 16 / 9; }
+  .interest-card-body,
+  .learning-card-body { padding: 13px 14px 12px; }
+
+  .radar-feed-item { min-height: 64px; padding-block: 11px; }
+  .profile-feature { min-height: 116px; }
+
+  .course-card,
+  .resource-card,
+  .learning-plan-card,
+  .learning-note-card,
+  .learning-overview-card { min-height: 0; padding: 14px; border-radius: 20px; }
+  .course-card { min-height: 132px; padding-bottom: 48px; }
+  .resource-card h3 { margin: 15px 0 8px; }
+  .resource-card-meta { margin-top: 13px; }
+  .learning-plan-card h3,
+  .learning-note-card h3 { margin: 13px 0 8px; }
+
+  .mutual-card { padding: 10px; }
+  .mutual-card-art { margin: -10px -10px 0; }
+  .mutual-card-body { padding-top: 9px; }
+}
