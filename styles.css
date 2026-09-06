@@ -3169,6 +3169,42 @@ html.pomodoro-focus-open { overflow: hidden; }
   .profile-tabs { flex-wrap: wrap; }
 }
 
+/* 电脑端校园动态：所有视觉位使用真实、无水印的网络图片。 */
+@media (min-width: 768px) {
+  .campus-feature-art {
+    background:
+      linear-gradient(180deg, rgba(20,30,26,.06), rgba(19,29,25,.62)),
+      url("./assets/campus-dynamic/open-day.jpg") center 45% / cover no-repeat;
+    text-shadow: 0 2px 12px rgba(0,0,0,.38);
+  }
+  .campus-thumb {
+    overflow: hidden;
+    background-position: center;
+    background-size: cover;
+    text-indent: -9999px;
+  }
+  .campus-thumb.thumb-club {
+    background-image:
+      linear-gradient(180deg, rgba(19,24,22,.02), rgba(19,24,22,.22)),
+      url("./assets/campus-dynamic/photo-club.jpg");
+    background-position: center 58%;
+  }
+  .campus-thumb.thumb-talk {
+    background-image:
+      linear-gradient(180deg, rgba(19,24,22,.02), rgba(19,24,22,.2)),
+      url("./assets/campus-dynamic/lecture.jpg");
+    background-position: center 44%;
+  }
+  .recap-collage i {
+    background-position: center;
+    background-size: cover;
+  }
+  .recap-collage i:nth-child(1) { background-image: url("./assets/campus-dynamic/concert-sunset.jpg"); }
+  .recap-collage i:nth-child(2) { background-image: url("./assets/campus-dynamic/concert-stage.jpg"); }
+  .recap-collage i:nth-child(3) { background-image: url("./assets/campus-dynamic/concert-musician.jpg"); background-position: center 36%; }
+  .recap-collage i:nth-child(4) { background-image: url("./assets/campus-dynamic/concert-lawn.jpg"); }
+}
+
 /* 手机一级栏目改为底部 Tab Bar；二级栏目成为唯一顶部导航。 */
 @media (max-width: 767px) {
   :root { --mobile-tabbar-height: 64px; }
