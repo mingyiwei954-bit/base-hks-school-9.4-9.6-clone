@@ -2663,11 +2663,12 @@ html.pomodoro-focus-open { overflow: hidden; }
   .mutual-card { padding: 12px; border-radius: 18px; }
   .mutual-card-art { margin: -12px -12px 0; aspect-ratio: 4 / 3; border-radius: 16px 16px 10px 10px; }
   .mutual-card-body { gap: 6px; padding-top: 12px; }
-  .mutual-card-kicker { font-size: 13px; }
-  .mutual-card h3 { font-size: 17px; line-height: 1.38; }
-  .mutual-card p { font-size: 14px; line-height: 1.45; }
-  .mutual-card-meta { align-items: flex-start; flex-direction: column; gap: 2px; font-size: 12px; line-height: 1.4; }
-  .mutual-route { align-items: flex-start; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.35; }
+  .mutual-cards-head { display: none; }
+  .mutual-card-kicker { font-size: 12px; }
+  .mutual-card h3 { font-size: 16px; line-height: 1.38; }
+  .mutual-card p { font-size: 13px; line-height: 1.45; }
+  .mutual-card-meta { align-items: flex-start; flex-direction: column; gap: 2px; font-size: 11px; line-height: 1.4; }
+  .mutual-route { align-items: flex-start; flex-direction: column; gap: 2px; font-size: 13px; line-height: 1.35; }
   .mutual-route b { font-size: 16px; line-height: 1; transform: rotate(90deg); }
   .mutual-detail-info,
   .is-ride-detail .mutual-detail-info { grid-template-columns: 1fr; }
