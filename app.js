@@ -1143,6 +1143,17 @@ const toolboxItems = [
   ['制作问卷', 'tool-amber'],
   ['课程表', 'tool-lake'],
 ];
+const toolboxDesktopPriority = [
+  '番茄钟',
+  '单词卡',
+  '校园地图',
+  '创建投票',
+  '制作问卷',
+  '课程表',
+  '学学单词',
+  '文件扫描',
+  '发起签到',
+];
 let toolboxActiveTab = 'all';
 let toolboxFavorites = [];
 let toolboxHistory = [];
@@ -1169,12 +1180,15 @@ function saveToolboxState() {
 }
 
 function getToolboxVisibleItems() {
-  if (toolboxActiveTab === 'favorites') return toolboxItems.filter(([name]) => toolboxFavorites.includes(name));
+  const desktopItems = window.matchMedia('(min-width: 768px)').matches
+    ? toolboxDesktopPriority.map((name) => toolboxItems.find(([itemName]) => itemName === name)).filter(Boolean)
+    : toolboxItems;
+  if (toolboxActiveTab === 'favorites') return desktopItems.filter(([name]) => toolboxFavorites.includes(name));
   if (toolboxActiveTab === 'history') {
     const recent = [...new Set(toolboxHistory.map((item) => item.name))];
     return recent.map((name) => toolboxItems.find((item) => item[0] === name)).filter(Boolean);
   }
-  return toolboxItems;
+  return desktopItems;
 }
 
 function toggleToolboxFavorite(name) {
