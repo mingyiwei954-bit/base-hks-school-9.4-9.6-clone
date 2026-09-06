@@ -1750,7 +1750,7 @@ input:focus-visible {
   border-color: var(--nav-glass-edge);
   border-radius: 0 26px 26px 0;
   box-shadow: 14px 10px 34px rgba(55, 35, 90, 0.1), inset -1px 0 0 rgba(255, 255, 255, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  transition: width 280ms var(--ease), opacity 180ms ease, border-color 240ms ease, box-shadow 240ms ease;
+  transition: width 280ms var(--ease), opacity 180ms ease, border-color 240ms ease, background 240ms ease, box-shadow 240ms ease;
   backdrop-filter: blur(4px) saturate(145%) !important;
   -webkit-backdrop-filter: blur(4px) saturate(145%) !important;
 }
@@ -1970,13 +1970,72 @@ html.pomodoro-focus-open { overflow: hidden; }
 .pomodoro-theme-white .pomodoro-focus-return { color: #000; border-color: #000; }
 @media (max-width: 600px) { .pomodoro-inline-setting { grid-template-columns: 22px 1fr; } .pomodoro-inline-setting small { grid-column: 2; margin-top: -8px; } .pomodoro-slider button { min-width: 108px; } }
 
-/* 综合、互助与学习库统一使用同一宽度的左侧栏；互助仅增加栏目数量。 */
-:root { --section-sidebar-width: 220px; }
+/* 综合、互助与学习库共用侧栏尺寸；桌面端收起后只保留图标轨道。 */
+:root {
+  --section-sidebar-width: 220px;
+  --section-sidebar-collapsed-width: 58px;
+  --section-sidebar-content-gap: 16px;
+  --section-sidebar-hover-intent-delay: 220ms;
+}
 .discovery-layer { padding-left: var(--section-sidebar-width); }
-.support-drawer,
-.support-drawer:hover,
-.support-drawer:focus-within { width: var(--section-sidebar-width); max-width: var(--section-sidebar-width); }
 .learning-library-page { grid-template-columns: var(--section-sidebar-width) minmax(0, 1fr); }
+
+@media (min-width: 768px) {
+  .support-drawer {
+    width: var(--section-sidebar-collapsed-width);
+    max-width: var(--section-sidebar-collapsed-width);
+  }
+  .support-drawer:hover,
+  .support-drawer:focus-within {
+    width: var(--section-sidebar-width);
+    max-width: var(--section-sidebar-width);
+  }
+  /* Only commit mouse hover after a short dwell; keyboard focus remains immediate. */
+  .support-drawer:hover:not(:focus-within) {
+    transition-delay: var(--section-sidebar-hover-intent-delay), 0ms, var(--section-sidebar-hover-intent-delay), var(--section-sidebar-hover-intent-delay), var(--section-sidebar-hover-intent-delay);
+  }
+  .support-drawer:not(:hover) .support-label,
+  .support-drawer:not(:hover) .support-drawer-title {
+    transition-delay: 0ms, 0ms;
+  }
+  .support-drawer:hover:not(:focus-within) .support-label,
+  .support-drawer:hover:not(:focus-within) .support-drawer-title {
+    transition-delay: calc(var(--section-sidebar-hover-intent-delay) + 65ms), calc(var(--section-sidebar-hover-intent-delay) + 45ms);
+  }
+  .serp-stage:has(> .support-drawer.is-visible) {
+    box-sizing: border-box;
+    width: calc(100% + var(--section-sidebar-width));
+    max-width: none;
+    margin-left: calc(-1 * var(--section-sidebar-width));
+    padding-left: calc(var(--section-sidebar-collapsed-width) + var(--section-sidebar-content-gap));
+    transition: padding-left 280ms var(--ease);
+  }
+  .serp-stage:has(> .support-drawer.is-visible:hover),
+  .serp-stage:has(> .support-drawer.is-visible:focus-within) {
+    padding-left: calc(var(--section-sidebar-width) + var(--section-sidebar-content-gap));
+  }
+  .serp-stage:has(> .support-drawer.is-visible:hover:not(:focus-within)) {
+    transition-delay: var(--section-sidebar-hover-intent-delay);
+  }
+  .serp-stage:has(> .support-drawer.is-visible:focus-within) {
+    transition-delay: 0ms;
+  }
+  .serp-stage:has(> .support-drawer:not(.is-visible)) {
+    box-sizing: border-box;
+    width: calc(100% + var(--section-sidebar-width));
+    max-width: none;
+    margin-left: calc(-1 * var(--section-sidebar-width));
+    padding-left: 24px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .serp-stage:has(> .support-drawer:not(.is-visible)) { padding-left: 16px; }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .serp-stage:has(> .support-drawer.is-visible) { transition-duration: 1ms; }
+}
 
 @media (max-width: 767px) {
   .discovery-layer { padding-left: 0; }
@@ -2053,8 +2112,8 @@ html.pomodoro-focus-open { overflow: hidden; }
 .mutual-card{min-width:0;display:flex;flex-direction:column;border:4px solid rgba(118,82,182,.48);border-radius:32px;background:rgba(255,254,250,.58);cursor:pointer;transition:border-color 180ms ease,box-shadow 180ms ease,transform 180ms ease;outline:none}
 .mutual-card:hover,.mutual-card:focus-visible{border-color:#7652b6;box-shadow:0 10px 24px rgba(55,35,90,.1);transform:translateY(-3px)}
 .mutual-card:active{transform:translateY(-1px)}
-.mutual-card-art,.mutual-detail-art{display:grid;place-items:center;min-height:156px;margin:0;border-radius:27px 27px 20px 20px;background:#eee8f7;border-bottom:3px solid rgba(118,82,182,.18)}
-.mutual-card-art span,.mutual-detail-art span{font-size:74px;line-height:1;filter:saturate(.86)}
+.mutual-card-art,.mutual-detail-art{position:relative;display:grid;place-items:center;min-height:156px;margin:0;overflow:hidden;border-radius:27px 27px 20px 20px;background:#eee8f7;border-bottom:3px solid rgba(118,82,182,.18)}
+.mutual-card-art img,.mutual-detail-art img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
 .mutual-card-body{display:grid;gap:9px;padding:20px 22px 23px;min-width:0}
 .mutual-card-kicker{color:#7652b6;font-size:17px;font-weight:800}
 .mutual-card h3{margin:0;color:var(--ink);font-size:26px;line-height:1.35;overflow-wrap:anywhere}
@@ -2076,7 +2135,6 @@ html.pomodoro-focus-open { overflow: hidden; }
 .mutual-detail-close:hover,.mutual-detail-close:focus-visible{color:#7652b6;background:rgba(118,82,182,.1);outline:none}
 .mutual-detail-eyebrow{display:block;margin-bottom:12px;color:#7652b6;font-size:18px;font-weight:800;letter-spacing:.05em}
 .mutual-detail-art{min-height:130px;border-radius:22px;margin-bottom:20px}
-.mutual-detail-art span{font-size:62px}
 .mutual-detail-card h2{margin:0 45px 18px 0;color:var(--ink);font-size:30px;line-height:1.35;overflow-wrap:anywhere}
 .mutual-detail-info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
 .is-ride-detail .mutual-detail-info{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -2095,6 +2153,21 @@ html.pomodoro-focus-open { overflow: hidden; }
 @keyframes mutual-detail-fade{from{opacity:0}to{opacity:1}}
 @keyframes mutual-detail-pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){.mutual-detail-layer,.mutual-detail-card{animation:none}.mutual-card{transition:none}}
+@media(min-width:768px){
+  .mutual-card{overflow:hidden}
+  .mutual-card-art{aspect-ratio:16/9;min-height:182px;border-radius:27px 27px 18px 18px}
+  .mutual-detail-art{aspect-ratio:16/8;min-height:220px}
+  .mutual-art-lost-books img,.mutual-art-lost-headphones img,.mutual-art-idle-monitor img{object-fit:contain}
+  .mutual-art-lost-books{background:#171313}
+  .mutual-art-lost-headphones{background:#d7d7d7}
+  .mutual-art-idle-monitor{background:#e5ddd3}
+  .mutual-card:hover .mutual-card-art img,.mutual-card:focus-visible .mutual-card-art img{transform:scale(1.018)}
+  .mutual-card-art img{transition:transform 240ms cubic-bezier(.2,.75,.25,1)}
+  html.mutual-detail-open,html.mutual-detail-open body{overflow:hidden}
+  body>.mutual-detail-layer.is-desktop-layer{z-index:140;padding:clamp(92px,11vh,118px) 32px 36px;isolation:isolate}
+  body>.mutual-detail-layer.is-desktop-layer .mutual-detail-card{width:min(640px,calc(100vw - 96px));max-height:calc(100dvh - clamp(132px,16vh,172px));overscroll-behavior:contain}
+  body>.mutual-detail-layer.is-desktop-layer .mutual-detail-close{z-index:4;top:16px;right:18px;border:2px solid rgba(118,82,182,.2);background:#fffdf8;box-shadow:0 5px 14px rgba(55,35,90,.08)}
+}
 @media(max-width:1023px){.mutual-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:767px){.mutual-cards-page{padding-bottom:30px}.mutual-card-grid{grid-template-columns:1fr;gap:16px}.mutual-card{border-radius:26px}.mutual-card-art{min-height:138px;border-radius:21px 21px 16px 16px}.mutual-card-body{padding:18px 19px 20px}.mutual-card h3{font-size:24px}.mutual-card p{font-size:18px}.mutual-detail-layer{padding:16px}.mutual-detail-card{padding:24px 20px;border-radius:26px}.mutual-detail-info,.is-ride-detail .mutual-detail-info{grid-template-columns:1fr 1fr}.mutual-detail-card h2{font-size:27px}.mutual-detail-card>p{font-size:18px}.mutual-detail-actions{justify-content:stretch}.mutual-detail-actions button{flex:1;min-width:130px}}
 
@@ -2787,11 +2860,27 @@ html.pomodoro-focus-open { overflow: hidden; }
     transition: top 280ms var(--ease), transform 280ms var(--ease), opacity 220ms ease;
   }
   .canvas .verticals-shell {
-    transition: top 300ms var(--ease), width 300ms var(--ease), transform 300ms var(--ease);
+    --desktop-verticals-width: min(1120px, calc(100vw - 48px));
+    top: 96px;
+    width: var(--desktop-verticals-width);
+    margin-left: calc((100vw - var(--desktop-verticals-width)) / 2 - var(--section-sidebar-width));
+    margin-right: 0;
+    border-radius: 26px;
+    transform: none;
+    transition: top 300ms var(--ease), width 300ms var(--ease), margin-left 300ms var(--ease);
   }
   .canvas .verticals-track {
-    transition: background 260ms ease, border-color 260ms ease, border-radius 280ms var(--ease), box-shadow 260ms ease, backdrop-filter 260ms ease;
+    overflow-y: hidden;
+    border-radius: 26px;
+    box-shadow: 0 8px 18px rgba(55, 35, 90, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78), inset 0 -1px 0 rgba(91, 72, 132, 0.08);
+    transition: background 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
   }
+  .canvas .verticals-track:hover {
+    box-shadow: 0 10px 22px rgba(55, 35, 90, 0.11), inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 -1px 0 rgba(91, 72, 132, 0.1);
+  }
+  .canvas .verticals-track::before { animation: none; }
+  .canvas .verticals-shell::before { border-radius: 26px 0 0 26px; }
+  .canvas .verticals-shell::after { border-radius: 0 26px 26px 0; }
   .canvas.is-nav-condensed .top-rail {
     top: 8px;
     left: 20px;
@@ -2800,8 +2889,8 @@ html.pomodoro-focus-open { overflow: hidden; }
     border-radius: 22px;
     pointer-events: auto;
     background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(247,242,255,.25) 48%, rgba(220,239,230,.3)) !important;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(4px) saturate(145%);
+    -webkit-backdrop-filter: blur(4px) saturate(145%);
   }
   .canvas.is-nav-condensed .discovery-layer { z-index: auto; }
   .canvas.is-nav-condensed .top-rail::before { border-radius: 21px; }
@@ -2818,20 +2907,22 @@ html.pomodoro-focus-open { overflow: hidden; }
   .canvas.is-nav-condensed .top-rail .login-trigger { height: 42px; }
   .canvas.is-nav-condensed .top-rail .account-menu { top: 52px; }
   .canvas.is-nav-condensed .verticals-shell {
+    --desktop-verticals-width: min(720px, calc(100vw - 320px));
     top: 16px;
     z-index: 31;
-    width: min(720px, calc(100vw - 320px));
-    transform: translateX(-98px);
+    width: var(--desktop-verticals-width);
+    margin-left: calc((100vw - var(--desktop-verticals-width)) / 2 - var(--section-sidebar-width));
+    transform: none;
   }
   .canvas.is-nav-condensed .verticals-track {
     height: 48px;
     padding-inline: 12px;
     border-color: transparent;
-    border-radius: 18px;
+    border-radius: 26px;
     background: linear-gradient(112deg, rgba(255,255,255,.2), rgba(247,242,255,.08) 54%, rgba(220,239,230,.14)) !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.44);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    box-shadow: 0 5px 14px rgba(55, 35, 90, 0.07), inset 0 1px 0 rgba(255,255,255,.52);
+    backdrop-filter: blur(4px) saturate(145%);
+    -webkit-backdrop-filter: blur(4px) saturate(145%);
   }
   .canvas.is-nav-condensed .verticals-track::after {
     inset: 3px;
@@ -2864,6 +2955,254 @@ html.pomodoro-focus-open { overflow: hidden; }
   .canvas .hanging-emblem,
   .canvas .verticals-shell,
   .canvas .verticals-track { transition: none !important; }
+}
+
+/* 电脑端“我的”：左侧公众主页，右侧个人私页。 */
+@media (min-width: 768px) {
+  .profile-page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto minmax(0, 1fr);
+    width: 100%;
+    overflow: hidden;
+    border: 3px solid rgba(118,82,182,.24);
+    border-radius: 32px;
+    background: rgba(255,254,250,.5);
+    box-shadow: 0 12px 30px rgba(55,35,90,.07);
+  }
+  .profile-cover {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    min-width: 0;
+    border-right: 1px solid rgba(118,82,182,.18);
+    border-bottom-color: rgba(24,49,40,.08);
+  }
+  .profile-cover::before {
+    content: "公众主页";
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    z-index: 2;
+    padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,.58);
+    border-radius: 12px;
+    color: #5e406e;
+    background: rgba(255,255,255,.58);
+    font-size: 16px;
+    font-weight: 750;
+    letter-spacing: .04em;
+  }
+  .profile-cover-art {
+    height: 164px;
+    background:
+      linear-gradient(100deg, rgba(70,45,94,.34), rgba(238,224,202,.12) 50%, rgba(85,121,104,.22)),
+      url("./assets/profile/campus-building.jpg") center 46% / cover no-repeat;
+  }
+  .profile-identity { padding: 0 26px 24px; }
+  .profile-identity h2 { font-size: 30px; }
+  .profile-identity p { font-size: 17px; }
+  .profile-tags { flex-wrap: wrap; gap: 8px; }
+  .profile-tags span { padding: 6px 10px; border-radius: 9px; font-size: 15px; }
+  .profile-edit { min-height: 42px; padding: 0 15px; border-width: 2px; border-radius: 14px; font-size: 16px; }
+  .profile-account-panel {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+    padding: 70px 24px 18px;
+    border-bottom: 1px solid rgba(24,49,40,.09);
+    background: rgba(240,235,247,.36);
+  }
+  .profile-account-panel::before {
+    content: "个人私页";
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    color: #573552;
+    font-size: 24px;
+    font-weight: 800;
+  }
+  .profile-account-panel::after {
+    content: "仅自己可见";
+    position: absolute;
+    top: 29px;
+    right: 24px;
+    color: #8b7d88;
+    font-size: 15px;
+    font-weight: 650;
+  }
+  .profile-account-panel button {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    min-height: 78px;
+    padding: 12px 14px;
+    border: 2px solid rgba(118,82,182,.18);
+    border-radius: 17px;
+    color: var(--ink);
+    background: rgba(255,255,255,.5);
+    text-align: left;
+    cursor: pointer;
+  }
+  .profile-account-panel button:hover,
+  .profile-account-panel button:focus-visible { border-color: rgba(118,82,182,.48); background: rgba(255,255,255,.76); outline: none; }
+  .profile-account-panel span { font-size: 18px; font-weight: 760; }
+  .profile-account-panel small { color: #7b8781; font-size: 14px; line-height: 1.4; }
+  .profile-tabs {
+    grid-column: 2;
+    grid-row: 2;
+    gap: 10px;
+    min-width: 0;
+    padding: 13px 24px;
+    overflow-x: auto;
+    border-left: 1px solid rgba(118,82,182,.18);
+    scrollbar-width: none;
+  }
+  .profile-tabs::-webkit-scrollbar { display: none; }
+  .profile-tabs button:first-child { display: none; }
+  .profile-tabs button { flex: 0 0 auto; min-height: 40px; padding: 0 10px; border-radius: 11px; font-size: 16px; white-space: nowrap; }
+  .profile-tabs button:hover,
+  .profile-tabs button:focus-visible { color: #7652b6; background: rgba(118,82,182,.08); outline: none; }
+  .profile-grid { display: contents; }
+  .profile-sidebar { display: none; }
+  .profile-main {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+    padding: 28px;
+    border-right: 1px solid rgba(118,82,182,.18);
+    background: rgba(255,254,250,.42);
+  }
+  .profile-right {
+    grid-column: 2;
+    grid-row: 3;
+    min-width: 0;
+    padding: 28px;
+    color: #66756d;
+    background: rgba(231,239,235,.34);
+    font-size: 18px;
+    line-height: 1.65;
+  }
+  .profile-right h3 { margin: 0 0 12px; font-size: 22px; }
+  .profile-right h3:not(:first-child) { margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(24,49,40,.1); }
+  .profile-right p { margin: 0 0 13px; font-size: 18px; }
+  .profile-section-head h3 { font-size: 22px; }
+  .profile-feature {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 190px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,.5);
+    border-radius: 20px;
+    color: #fff;
+    background-color: #574565;
+    background-position: center;
+    background-size: cover;
+    box-shadow: inset 0 -80px 70px rgba(18,20,20,.38);
+  }
+  .profile-feature.feature-photo {
+    background-image:
+      linear-gradient(180deg, rgba(17,20,20,.08), rgba(16,19,18,.68)),
+      url("./assets/profile/campus-night.jpg");
+    background-position: center 58%;
+  }
+  .profile-feature.feature-note {
+    background-image:
+      linear-gradient(180deg, rgba(26,21,18,.04), rgba(35,29,24,.7)),
+      url("./assets/profile/study-notes.jpg");
+    background-position: center 62%;
+  }
+  .profile-feature.feature-collection {
+    background-image:
+      linear-gradient(180deg, rgba(18,25,22,.03), rgba(18,25,22,.68)),
+      url("./assets/profile/library-study.jpg");
+    background-position: center 52%;
+  }
+  .profile-feature > span,
+  .profile-feature h4 {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    text-shadow: 0 1px 8px rgba(0,0,0,.34);
+  }
+  .profile-feature > span {
+    align-self: flex-start;
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: rgba(14,17,16,.38);
+  }
+  .profile-feature h4 { margin-top: 14px; }
+  .profile-post {
+    position: relative;
+    align-items: flex-end;
+    gap: 16px;
+    min-height: 184px;
+    overflow: hidden;
+    padding: 24px;
+    border: 2px solid rgba(255,255,255,.52);
+    border-radius: 20px;
+    color: #fff;
+    background:
+      linear-gradient(90deg, rgba(16,21,20,.78), rgba(16,21,20,.24)),
+      url("./assets/profile/campus-building.jpg") center 55% / cover no-repeat;
+    box-shadow: inset 0 -72px 72px rgba(11,16,15,.2);
+  }
+  .profile-post > * { position: relative; z-index: 1; }
+  .profile-post .campus-eyebrow,
+  .profile-post h4,
+  .profile-post p,
+  .profile-post-meta {
+    color: #fff;
+    text-shadow: 0 1px 8px rgba(0,0,0,.38);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .profile-account-panel { grid-template-columns: 1fr; padding-top: 68px; }
+  .profile-account-panel button { min-height: 62px; }
+  .profile-feature-grid { grid-template-columns: 1fr; }
+  .profile-tabs { flex-wrap: wrap; }
+}
+
+/* 电脑端校园动态：所有视觉位使用真实、无水印的网络图片。 */
+@media (min-width: 768px) {
+  .campus-feature-art {
+    background:
+      linear-gradient(180deg, rgba(20,30,26,.06), rgba(19,29,25,.62)),
+      url("./assets/campus-dynamic/open-day.jpg") center 45% / cover no-repeat;
+    text-shadow: 0 2px 12px rgba(0,0,0,.38);
+  }
+  .campus-thumb {
+    overflow: hidden;
+    background-position: center;
+    background-size: cover;
+    text-indent: -9999px;
+  }
+  .campus-thumb.thumb-club {
+    background-image:
+      linear-gradient(180deg, rgba(19,24,22,.02), rgba(19,24,22,.22)),
+      url("./assets/campus-dynamic/photo-club.jpg");
+    background-position: center 58%;
+  }
+  .campus-thumb.thumb-talk {
+    background-image:
+      linear-gradient(180deg, rgba(19,24,22,.02), rgba(19,24,22,.2)),
+      url("./assets/campus-dynamic/lecture.jpg");
+    background-position: center 44%;
+  }
+  .recap-collage i {
+    background-position: center;
+    background-size: cover;
+  }
+  .recap-collage i:nth-child(1) { background-image: url("./assets/campus-dynamic/concert-sunset.jpg"); }
+  .recap-collage i:nth-child(2) { background-image: url("./assets/campus-dynamic/concert-stage.jpg"); }
+  .recap-collage i:nth-child(3) { background-image: url("./assets/campus-dynamic/concert-musician.jpg"); background-position: center 36%; }
+  .recap-collage i:nth-child(4) { background-image: url("./assets/campus-dynamic/concert-lawn.jpg"); }
 }
 
 /* 手机一级栏目改为底部 Tab Bar；二级栏目成为唯一顶部导航。 */
