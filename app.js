@@ -755,6 +755,64 @@ function renderMobileSubnav(vertical = activeVertical) {
   syncMobileSubnavSelection(selected);
 }
 
+function setupMobileSubnavDrag(scroller) {
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let startScrollLeft = 0;
+  let isHorizontalDrag = false;
+  let suppressClick = false;
+
+  const resetPointer = () => {
+    pointerId = null;
+    isHorizontalDrag = false;
+  };
+
+  scroller.addEventListener('pointerdown', (event) => {
+    if (!mobileSearchMedia.matches || event.pointerType === 'mouse') return;
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    startScrollLeft = scroller.scrollLeft;
+    isHorizontalDrag = false;
+  });
+
+  scroller.addEventListener('pointermove', (event) => {
+    if (event.pointerId !== pointerId) return;
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    if (!isHorizontalDrag) {
+      if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 8) return;
+      if (Math.abs(deltaY) >= Math.abs(deltaX)) {
+        resetPointer();
+        return;
+      }
+      isHorizontalDrag = true;
+      suppressClick = true;
+      scroller.setPointerCapture?.(event.pointerId);
+    }
+    scroller.scrollLeft = startScrollLeft - deltaX;
+    event.preventDefault();
+  });
+
+  scroller.addEventListener('pointerup', () => {
+    resetPointer();
+    window.setTimeout(() => { suppressClick = false; }, 0);
+  });
+  scroller.addEventListener('pointercancel', () => {
+    resetPointer();
+    suppressClick = false;
+  });
+  scroller.addEventListener('click', (event) => {
+    if (!suppressClick) return;
+    suppressClick = false;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
+}
+
+if (mobileSubnavTrack) setupMobileSubnavDrag(mobileSubnavTrack);
+
 mobileSubnavTrack?.addEventListener('click', (event) => {
   const button = event.target.closest('[data-mobile-section]');
   if (!button) return;

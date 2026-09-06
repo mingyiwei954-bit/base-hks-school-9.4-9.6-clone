@@ -2264,7 +2264,7 @@ html.pomodoro-focus-open { overflow: hidden; }
     overscroll-behavior-inline: contain;
     scroll-padding-inline: 12px;
     scrollbar-width: none;
-    touch-action: pan-x;
+    touch-action: pan-y;
   }
   .mobile-subnav-track::-webkit-scrollbar { display: none; }
   .mobile-subnav-track button {
@@ -2298,6 +2298,15 @@ html.pomodoro-focus-open { overflow: hidden; }
   .canvas .result-items { width: 100%; max-width: none; margin: 0; }
   .canvas .result-items > * { max-width: 100%; min-width: 0; }
 
+  /* 提前合成手机固定层，避免首次滚动时才创建图层造成短促停顿。 */
+  .mobile-subnav,
+  .canvas .verticals-shell,
+  .canvas .search-shell {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
   /* 底部搜索圆钮与展开搜索条。 */
   .canvas .search-shell {
     position: fixed;
@@ -2311,7 +2320,7 @@ html.pomodoro-focus-open { overflow: hidden; }
     width: auto !important;
     height: 64px;
     pointer-events: none;
-    transform: none;
+    transform: translateZ(0);
   }
   .canvas .search-shell[hidden] { display: none !important; }
   .canvas .search-widget {
