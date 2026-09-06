@@ -684,9 +684,19 @@ let mobilePageTransitionToken = 0;
 let mobilePageSwapTimer = 0;
 let mobilePageCleanupTimer = 0;
 
+function commitMobilePageChange(action) {
+  action();
+  window.scrollTo(0, 0);
+  window.requestAnimationFrame(() => window.scrollTo(0, 0));
+}
+
 function runMobilePageTransition(action) {
-  if (!mobileSearchMedia.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches || resultItems.hidden) {
+  if (!mobileSearchMedia.matches) {
     action();
+    return;
+  }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || resultItems.hidden) {
+    commitMobilePageChange(action);
     return;
   }
 
@@ -698,7 +708,7 @@ function runMobilePageTransition(action) {
 
   mobilePageSwapTimer = window.setTimeout(() => {
     if (token !== mobilePageTransitionToken) return;
-    action();
+    commitMobilePageChange(action);
     resultItems.classList.remove('is-stage-leaving');
     resultItems.classList.add('is-stage-entering');
     mobilePageCleanupTimer = window.setTimeout(() => {
