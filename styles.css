@@ -3049,21 +3049,23 @@ html.pomodoro-focus-open { overflow: hidden; }
   .profile-feature,
   .profile-post { touch-action: pan-y; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 
-  .canvas .result-item { margin-bottom: 10px; padding: 14px; border-radius: 20px; }
+  .canvas .result-item { margin-bottom: 8px; padding: 11px 12px; border-radius: 20px; }
   .canvas .result-item .author-rail {
-    grid-template-columns: 38px minmax(0, 1fr) auto;
-    gap: 1px 9px;
-    margin-bottom: 10px;
-    padding-bottom: 9px;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 0 7px;
+    min-height: 32px;
+    margin-bottom: 7px;
+    padding-bottom: 6px;
   }
-  .canvas .result-item .avatar { width: 38px; height: 38px; }
-  .canvas .result-item .display-name { font-size: 15px; }
-  .canvas .result-item .user-badge { font-size: 12px; }
+  .canvas .result-item .avatar { width: 32px; height: 32px; }
+  .canvas .result-item .display-name { font-size: 14px; line-height: 1.2; }
+  .canvas .result-item .user-badge { font-size: 11px; line-height: 1.25; }
+  .canvas .result-item .user-badge b { font-size: 8px; }
   .canvas .result-item .result-header { font-size: 18px; line-height: 1.34; }
-  .canvas .result-item .result-summary { margin-top: 6px; font-size: 15px; line-height: 1.52; }
-  .canvas .result-item .result-tags { gap: 5px; margin-top: 6px; }
-  .canvas .result-item .result-tags span { padding: 4px 8px; font-size: 12px; }
-  .canvas .result-item .result-meta { gap: 5px 11px; margin-top: 7px; font-size: 12px; }
+  .canvas .result-item .result-summary { margin-top: 5px; font-size: 15px; line-height: 1.46; }
+  .canvas .result-item .result-tags { gap: 5px; margin-top: 5px; }
+  .canvas .result-item .result-tags span { padding: 3px 7px; font-size: 12px; }
+  .canvas .result-item .result-meta { gap: 4px 10px; margin-top: 6px; font-size: 12px; line-height: 1.35; }
 
   .canvas .result-item.is-expanded > .result-content .result-summary,
   .canvas .result-item.is-expanded > .result-content .result-tags,
