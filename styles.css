@@ -2185,6 +2185,7 @@ html.pomodoro-focus-open { overflow: hidden; }
 
   html,
   body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  html { overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
   body { min-width: 0; }
   .canvas { width: 100%; min-width: 0; }
 
@@ -2262,11 +2263,15 @@ html.pomodoro-focus-open { overflow: hidden; }
     height: 48px;
     padding: 0 12px;
     overflow-x: auto;
+    overflow-y: clip;
     overscroll-behavior-inline: contain;
     scroll-padding-inline: 12px;
     scrollbar-width: none;
     touch-action: pan-y;
   }
+  .canvas .verticals-track,
+  .canvas .verticals-track button,
+  .canvas .search-widget { touch-action: pan-y pinch-zoom; }
   .mobile-subnav-track::-webkit-scrollbar { display: none; }
   .mobile-subnav-track button {
     position: relative;
@@ -2540,8 +2545,9 @@ html.pomodoro-focus-open { overflow: hidden; }
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
   }
+  .resource-filter-scroller { overscroll-behavior-inline: auto; touch-action: pan-x pan-y; }
   .interest-topics::-webkit-scrollbar { display: none; }
   .interest-topics button { flex: 0 0 auto; min-height: 46px; padding: 0 15px; font-size: 14px; }
   .interest-grid,
@@ -2731,6 +2737,9 @@ html.pomodoro-focus-open { overflow: hidden; }
     margin: 0;
     padding: 24px 17px calc(20px + env(safe-area-inset-bottom));
     overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     border-width: 2px 2px 0;
     border-radius: 28px 28px 0 0;
     background: #fffefa;
@@ -2794,7 +2803,7 @@ html.pomodoro-focus-open { overflow: hidden; }
   }
   .post-detail-layout { display: flex; flex-direction: column; }
   .post-detail-media { height: 34dvh; min-height: 220px; flex: 0 0 auto; }
-  .post-detail-content { min-height: 0; overflow-y: auto; padding: 17px; }
+  .post-detail-content { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 17px; }
   .post-detail-top button { min-width: 46px; min-height: 46px; }
   .post-follow { padding-inline: 14px; }
   .post-detail-content h2 { font-size: 24px; }

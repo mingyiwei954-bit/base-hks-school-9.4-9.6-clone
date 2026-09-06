@@ -70,6 +70,14 @@ let scrollFrame = 0;
 const topRail = document.querySelector('.top-rail');
 const mobileSearchMedia = window.matchMedia('(max-width: 767px)');
 
+const mobileNestedScrollAreas = '.points-card,.mutual-detail-card,.learning-detail-card,.learning-editor-card,.resource-detail-card,.course-notes-card,.campus-map-preview-card,.login-card,.pomodoro-card,.pomodoro-scroll,.pomodoro-focus-view,.post-detail-content';
+document.addEventListener('wheel', (event) => {
+  if (!mobileSearchMedia.matches || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+  if (event.target instanceof Element && event.target.closest(mobileNestedScrollAreas)) return;
+  event.preventDefault();
+  window.scrollBy({ top: event.deltaY * 1.35, left: 0, behavior: 'auto' });
+}, { passive: false, capture: true });
+
 function syncCondensedNavigation() {
   const condensed = !mobileSearchMedia.matches && Boolean(topRail?.classList.contains('is-scrolled'));
   canvas?.classList.toggle('is-nav-condensed', condensed);
@@ -764,6 +772,7 @@ verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
 });
 
 verticalsTrack.addEventListener('wheel', (event) => {
+  if (mobileSearchMedia.matches) return;
   if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
   event.preventDefault();
   verticalsTrack.scrollBy({ left: event.deltaY, behavior: 'smooth' });
@@ -887,8 +896,8 @@ function setupMobileSubnavDrag(scroller) {
     const deltaX = event.clientX - startX;
     const deltaY = event.clientY - startY;
     if (!isHorizontalDrag) {
-      if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 8) return;
-      if (Math.abs(deltaY) >= Math.abs(deltaX)) {
+      if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 12) return;
+      if (Math.abs(deltaX) < Math.abs(deltaY) * 1.35) {
         resetPointer();
         return;
       }
@@ -2013,9 +2022,9 @@ function openResourceDetail(resource) {
   layer.querySelector('.resource-detail-close').focus();
 }
 function setupResourceScroller(scroller) {
-  scroller.addEventListener('wheel', (event) => { if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return; event.preventDefault(); scroller.scrollBy({ left: event.deltaY, behavior: 'smooth' }); }, { passive: false });
+  scroller.addEventListener('wheel', (event) => { if (mobileSearchMedia.matches || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return; event.preventDefault(); scroller.scrollBy({ left: event.deltaY, behavior: 'smooth' }); }, { passive: false });
   let startX = null; let startScroll = 0;
-  scroller.addEventListener('pointerdown', (event) => { if (event.target.closest('button')) { startX = null; return; } startX = event.clientX; startScroll = scroller.scrollLeft; scroller.setPointerCapture?.(event.pointerId); });
+  scroller.addEventListener('pointerdown', (event) => { if (mobileSearchMedia.matches || event.target.closest('button')) { startX = null; return; } startX = event.clientX; startScroll = scroller.scrollLeft; scroller.setPointerCapture?.(event.pointerId); });
   scroller.addEventListener('pointermove', (event) => { if (startX === null) return; scroller.scrollLeft = startScroll - (event.clientX - startX); });
   scroller.addEventListener('pointerup', () => { startX = null; });
   scroller.addEventListener('pointercancel', () => { startX = null; });
