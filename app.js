@@ -826,8 +826,15 @@ const mutualCardData = {
   ],
 };
 
+let mutualDetailKeydownHandler = null;
+
 function closeMutualDetail() {
-  resultItems.querySelector('.mutual-detail-layer')?.remove();
+  document.querySelector('.mutual-detail-layer')?.remove();
+  document.documentElement.classList.remove('mutual-detail-open');
+  if (mutualDetailKeydownHandler) {
+    document.removeEventListener('keydown', mutualDetailKeydownHandler);
+    mutualDetailKeydownHandler = null;
+  }
 }
 
 function openMutualDetail(item, category) {
@@ -843,8 +850,21 @@ function openMutualDetail(item, category) {
     ? `<div class="mutual-detail-info"><span>出发地<b>${item.from}</b></span><span>目的地<b>${item.to}</b></span><span>出发时间<b>${item.departure}</b></span><span>队伍状态<b>${item.remaining}</b></span></div>`
     : `<div class="mutual-detail-info"><span>${isLost ? '地点' : '价格'}<b>${isLost ? item.place : item.price}</b></span><span>${isLost ? '发现时间' : '物品成色'}<b>${isLost ? item.time : item.condition}</b></span><span>${isLost ? '状态' : '交易地点'}<b>${isLost ? item.status : item.place}</b></span></div>`;
   layer.innerHTML = `<article class="mutual-detail-card ${isRide ? 'is-ride-detail' : ''}"><button class="mutual-detail-close" type="button" aria-label="关闭详情">×</button><span class="mutual-detail-eyebrow">${category} · 详情</span><div class="mutual-detail-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" decoding="async" /></div><h2>${item.title}</h2>${info}<p>${item.description}</p><div class="mutual-detail-contact"><span>发起人 / 联系方式</span><b>${item.contact}</b></div><div class="mutual-detail-actions"><button class="mutual-detail-primary" type="button">${isRide ? '加入组队' : item.action}</button><button class="mutual-detail-secondary" type="button">☆ 收藏</button></div></article>`;
-  resultItems.append(layer);
+  const useDesktopLayer = window.matchMedia('(min-width: 768px)').matches && (category === '失物回家' || category === '闲置流转');
+  if (useDesktopLayer) {
+    layer.classList.add('is-desktop-layer');
+    document.body.append(layer);
+    document.documentElement.classList.add('mutual-detail-open');
+  } else {
+    resultItems.append(layer);
+  }
   const close = () => closeMutualDetail();
+  if (useDesktopLayer) {
+    mutualDetailKeydownHandler = (event) => {
+      if (event.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', mutualDetailKeydownHandler);
+  }
   layer.querySelector('.mutual-detail-close').addEventListener('click', close);
   layer.addEventListener('click', (event) => { if (event.target === layer) close(); });
   layer.querySelector('.mutual-detail-primary').addEventListener('click', () => showToast(`${isRide ? '加入组队' : '联系发起人'}功能为前端演示`));

@@ -2163,6 +2163,10 @@ html.pomodoro-focus-open { overflow: hidden; }
   .mutual-art-idle-monitor{background:#e5ddd3}
   .mutual-card:hover .mutual-card-art img,.mutual-card:focus-visible .mutual-card-art img{transform:scale(1.018)}
   .mutual-card-art img{transition:transform 240ms cubic-bezier(.2,.75,.25,1)}
+  html.mutual-detail-open,html.mutual-detail-open body{overflow:hidden}
+  body>.mutual-detail-layer.is-desktop-layer{z-index:140;padding:clamp(92px,11vh,118px) 32px 36px;isolation:isolate}
+  body>.mutual-detail-layer.is-desktop-layer .mutual-detail-card{width:min(640px,calc(100vw - 96px));max-height:calc(100dvh - clamp(132px,16vh,172px));overscroll-behavior:contain}
+  body>.mutual-detail-layer.is-desktop-layer .mutual-detail-close{z-index:4;top:16px;right:18px;border:2px solid rgba(118,82,182,.2);background:#fffdf8;box-shadow:0 5px 14px rgba(55,35,90,.08)}
 }
 @media(max-width:1023px){.mutual-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:767px){.mutual-cards-page{padding-bottom:30px}.mutual-card-grid{grid-template-columns:1fr;gap:16px}.mutual-card{border-radius:26px}.mutual-card-art{min-height:138px;border-radius:21px 21px 16px 16px}.mutual-card-body{padding:18px 19px 20px}.mutual-card h3{font-size:24px}.mutual-card p{font-size:18px}.mutual-detail-layer{padding:16px}.mutual-detail-card{padding:24px 20px;border-radius:26px}.mutual-detail-info,.is-ride-detail .mutual-detail-info{grid-template-columns:1fr 1fr}.mutual-detail-card h2{font-size:27px}.mutual-detail-card>p{font-size:18px}.mutual-detail-actions{justify-content:stretch}.mutual-detail-actions button{flex:1;min-width:130px}}
