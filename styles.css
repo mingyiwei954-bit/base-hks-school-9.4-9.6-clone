@@ -963,7 +963,7 @@ button { color: inherit; -webkit-tap-highlight-color: transparent; }
 .tool-favorite { position: absolute; top: 14px; right: 16px; z-index: 2; width: 38px; height: 38px; padding: 0; border: 2px solid rgba(118,82,182,.2); border-radius: 50%; color: #7652b6; background: rgba(255,255,255,.42); font-size: 24px; line-height: 1; cursor: pointer; }
 .tool-favorite:hover, .tool-favorite:focus-visible { border-color: currentColor; background: rgba(255,255,255,.7); outline: none; }
 @media (max-width: 1199px) { .toolbox-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; } }
-@media (max-width: 767px) { .toolbox-head { display: block; padding-top: 4px; } .toolbox-tabs { margin-top: 16px; } .toolbox-tabs button { font-size: 17px; padding: 9px 14px; } .toolbox-grid { grid-template-columns: 1fr; gap: 20px; margin-top: 22px; } .tool-card { aspect-ratio: 4 / 3; border-radius: 32px; border-width: 4px; } }
+@media (max-width: 767px) { .toolbox-head { display: block; padding-top: 4px; } .toolbox-tabs { margin-top: 16px; } .toolbox-tabs button { font-size: 17px; padding: 9px 14px; } .toolbox-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 22px; } .tool-card { aspect-ratio: 4 / 3; border-radius: 22px; border-width: 3px; } }
 
 .post-detail-dialog{width:min(1040px,calc(100vw - 48px));max-width:none;height:min(720px,88vh);padding:0;border:1px solid rgba(24,49,40,.14);background:var(--surface);color:var(--ink);box-shadow:0 24px 70px rgba(29,46,38,.22)}.post-detail-dialog::backdrop{background:rgba(18,31,25,.3);backdrop-filter:blur(5px)}.post-detail-layout{display:grid;grid-template-columns:1.15fr 1fr;height:100%}.post-detail-media{position:relative;overflow:hidden;background:#e7e0eb}.post-detail-media img{width:100%;height:100%;object-fit:cover}.post-detail-count{position:absolute;right:14px;bottom:14px;padding:5px 9px;border-radius:999px;color:#fff;background:#0008;font-size:10px}.post-detail-content{display:flex;flex-direction:column;padding:24px 26px}.post-detail-top{display:flex;align-items:center;gap:10px}.post-detail-author{display:flex;align-items:center;gap:9px;flex:1;font-size:13px;font-weight:600}.post-detail-author b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:var(--green);background:#edf4ef}.post-detail-author small{display:block;margin-top:3px;color:#87928c;font-size:10px;font-weight:400}.post-follow{padding:6px 12px;border:1px solid #7652b655;border-radius:999px;color:#7652b6;background:transparent;font-size:11px}.post-detail-close{border:0;background:transparent;color:#7b8781;font-size:24px;cursor:pointer}.post-detail-content h2{margin:28px 0 10px;font-size:24px}.post-detail-text{margin:0;color:#66746d;font-size:13px;line-height:1.8}.post-detail-tags{display:flex;gap:7px;margin-top:16px}.post-detail-tags span{padding:5px 9px;border:1px solid #7652b644;color:#7652b6;font-size:10px}.post-detail-comments{flex:1;margin-top:28px;border-top:1px solid #1831281a}.post-detail-comments h3{margin:16px 0 8px;font-size:14px}.post-detail-comments p{margin:0;color:#919994;font-size:11px}.post-detail-actions{display:flex;gap:14px;padding-top:16px;border-top:1px solid #1831281a}.post-detail-actions button{border:0;background:transparent;color:#6f7d75;font-size:11px}
 @media (max-width:560px){.post-detail-dialog{width:100%;height:88vh;margin:12vh 0 0;border-bottom:0}.post-detail-layout{display:flex;flex-direction:column}.post-detail-media{height:36vh;flex:0 0 36vh}.post-detail-content{overflow:auto;padding:18px}.post-detail-content h2{margin-top:18px;font-size:20px}.post-detail-actions{position:sticky;bottom:0;margin:0 -18px;padding:14px 18px;background:var(--surface)}}
@@ -2614,12 +2614,14 @@ html.pomodoro-focus-open { overflow: hidden; }
   .learning-primary-action,
   .learning-light-action { width: 100%; min-height: 52px; }
 
+  .toolbox-page { box-sizing: border-box; padding-inline: 4px; }
   .toolbox-head { padding: 2px 0 12px; border-bottom: 0; }
   .toolbox-head h2 { font-size: 27px; }
   .toolbox-tabs { display: none; }
-  .toolbox-grid { grid-template-columns: 1fr; gap: 16px; margin-top: 8px; }
-  .tool-card { aspect-ratio: 16 / 9; border-width: 3px; border-radius: var(--mobile-card-radius); }
-  .tool-favorite { width: 46px; height: 46px; }
+  .toolbox-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+  .tool-card { aspect-ratio: 4 / 3; border-width: 3px; border-radius: 20px; }
+  .tool-card.has-cover { padding: 7px; }
+  .tool-favorite { top: 8px; right: 8px; width: 40px; height: 40px; font-size: 22px; }
 
   .vote-page,
   .survey-page,
