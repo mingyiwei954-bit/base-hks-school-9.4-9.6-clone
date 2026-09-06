@@ -647,8 +647,113 @@ function selectVertical(button) {
   verticalsTrack.scrollTo({ left: targetLeft, behavior: 'smooth' });
 }
 
+const mobileTabAnimationTimers = new WeakMap();
+
+function runMobileTabAction(button, event, action) {
+  if (!mobileSearchMedia.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    action();
+    return;
+  }
+
+  const tablist = button.closest('[role="tablist"]');
+  if (!tablist) {
+    action();
+    return;
+  }
+
+  window.clearTimeout(mobileTabAnimationTimers.get(tablist));
+  tablist.querySelectorAll('.is-tab-pressing').forEach((tab) => tab.classList.remove('is-tab-pressing'));
+  button.querySelectorAll('.mobile-tab-ripple').forEach((ripple) => ripple.remove());
+
+  const bounds = button.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const hasPointerPosition = Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY) && (event.clientX || event.clientY);
+  ripple.className = 'mobile-tab-ripple';
+  ripple.style.setProperty('--tab-ripple-x', `${hasPointerPosition ? event.clientX - bounds.left : bounds.width / 2}px`);
+  ripple.style.setProperty('--tab-ripple-y', `${hasPointerPosition ? event.clientY - bounds.top : bounds.height / 2}px`);
+  ripple.style.setProperty('--tab-ripple-size', `${Math.max(bounds.width, bounds.height) * 1.8}px`);
+  button.append(ripple);
+  button.classList.add('is-tab-pressing');
+
+  const timer = window.setTimeout(() => {
+    button.classList.remove('is-tab-pressing');
+    action();
+  }, 100);
+  mobileTabAnimationTimers.set(tablist, timer);
+  window.setTimeout(() => ripple.remove(), 520);
+}
+
+let mobilePageTransitionToken = 0;
+let mobilePageSwapTimer = 0;
+let mobilePageCleanupTimer = 0;
+let mobilePrimaryPageAnimation = null;
+
+function commitMobilePageChange(action) {
+  action();
+  window.scrollTo(0, 0);
+  window.requestAnimationFrame(() => window.scrollTo(0, 0));
+}
+
+function runMobilePageTransition(action) {
+  if (!mobileSearchMedia.matches) {
+    action();
+    return;
+  }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || resultItems.hidden) {
+    commitMobilePageChange(action);
+    return;
+  }
+
+  const token = ++mobilePageTransitionToken;
+  mobilePrimaryPageAnimation?.cancel();
+  mobilePrimaryPageAnimation = null;
+  window.clearTimeout(mobilePageSwapTimer);
+  window.clearTimeout(mobilePageCleanupTimer);
+  resultItems.classList.remove('is-stage-entering');
+  resultItems.classList.add('is-stage-leaving');
+
+  mobilePageSwapTimer = window.setTimeout(() => {
+    if (token !== mobilePageTransitionToken) return;
+    commitMobilePageChange(action);
+    resultItems.classList.remove('is-stage-leaving');
+    resultItems.classList.add('is-stage-entering');
+    mobilePageCleanupTimer = window.setTimeout(() => {
+      if (token === mobilePageTransitionToken) resultItems.classList.remove('is-stage-entering');
+    }, 210);
+  }, 72);
+}
+
+function runMobilePrimaryPageTransition(action) {
+  if (!mobileSearchMedia.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches || resultItems.hidden) {
+    if (mobileSearchMedia.matches) commitMobilePageChange(action);
+    else action();
+    return;
+  }
+
+  const token = ++mobilePageTransitionToken;
+  window.clearTimeout(mobilePageSwapTimer);
+  window.clearTimeout(mobilePageCleanupTimer);
+  resultItems.classList.remove('is-stage-leaving', 'is-stage-entering');
+  mobilePrimaryPageAnimation?.cancel();
+  commitMobilePageChange(action);
+
+  mobilePrimaryPageAnimation = resultItems.animate([
+    { opacity: .94, transform: 'translate3d(0, 4px, 0) scale(.994)' },
+    { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+  ], {
+    duration: 190,
+    easing: 'cubic-bezier(.22,.8,.3,1)',
+    fill: 'both',
+  });
+  mobilePrimaryPageAnimation.onfinish = () => {
+    if (token !== mobilePageTransitionToken) return;
+    mobilePrimaryPageAnimation.cancel();
+    mobilePrimaryPageAnimation = null;
+  };
+}
+
 verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
-  button.addEventListener('click', () => selectVertical(button));
+  button.addEventListener('click', (event) => runMobileTabAction(button, event, () => runMobilePrimaryPageTransition(() => selectVertical(button))));
   button.addEventListener('keydown', (event) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
@@ -656,12 +761,13 @@ verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
     const current = tabs.indexOf(button);
     const direction = event.key === 'ArrowRight' ? 1 : -1;
     const next = tabs[(current + direction + tabs.length) % tabs.length];
-    selectVertical(next);
+    next.click();
     next.focus();
   });
 });
 
 verticalsTrack.addEventListener('wheel', (event) => {
+  if (mobileSearchMedia.matches) return;
   if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
   event.preventDefault();
   verticalsTrack.scrollBy({ left: event.deltaY, behavior: 'smooth' });
@@ -761,17 +867,19 @@ function renderMobileSubnav(vertical = activeVertical) {
 mobileSubnavTrack?.addEventListener('click', (event) => {
   const button = event.target.closest('[data-mobile-section]');
   if (!button) return;
-  const value = button.dataset.mobileSection;
-  if (activeVertical === '工具箱') {
-    toolboxActiveTab = value;
-    sidebarState.工具箱 = value;
-    saveSidebarState();
-    renderToolbox();
-  } else {
-    sidebarState[activeVertical] = value;
-    saveSidebarState();
-    renderSupportResult(value);
-  }
+  runMobileTabAction(button, event, () => runMobilePageTransition(() => {
+    const value = button.dataset.mobileSection;
+    if (activeVertical === '工具箱') {
+      toolboxActiveTab = value;
+      sidebarState.工具箱 = value;
+      saveSidebarState();
+      renderToolbox();
+    } else {
+      sidebarState[activeVertical] = value;
+      saveSidebarState();
+      renderSupportResult(value);
+    }
+  }));
 });
 
 mobileSubnavTrack?.addEventListener('keydown', (event) => {
@@ -810,19 +918,19 @@ const drawerIcons = {
 
 const mutualCardData = {
   失物回家: [
-    { image: './assets/mutual/lost-umbrella.webp', imageAlt: '雨滴落在黑色长柄雨伞的伞面上', tone: 'lost-umbrella', title: '黑色长柄雨伞', place: '明德楼一层门厅', time: '今天 08:40', status: '失物', description: '伞柄上有一圈浅灰色胶带，最后一次使用是在早课前。', contact: '李同学 · 站内联系', action: '联系失主' },
-    { image: './assets/mutual/lost-book-bag.webp', imageAlt: '深蓝与米白拼色的帆布书袋', tone: 'lost-books', title: '蓝色帆布书袋', place: '图书馆三层靠窗区', time: '昨天 19:10', status: '失物', description: '袋内有两本专业课教材和一只银色签字笔，已交到图书馆服务台。', contact: '周同学 · 图书馆服务台', action: '联系失主' },
-    { image: './assets/mutual/lost-earbuds.webp', imageAlt: '木桌上的白色无线耳机盒', tone: 'lost-headphones', title: '白色无线耳机盒', place: '世纪馆报告厅外', time: '9 月 16 日 16:30', status: '寻物', description: '透明保护壳上贴着一颗小树贴纸，希望有拾到的同学帮忙留意。', contact: '陈同学 · 站内联系', action: '联系发布者' },
+    { icon: '☂', image: './assets/mutual/lost-umbrella.webp', imageAlt: '雨水中的黑色长柄雨伞', tone: 'lost-umbrella', title: '黑色长柄雨伞', place: '明德楼一层门厅', time: '今天 08:40', status: '失物', description: '伞柄上有一圈浅灰色胶带，最后一次使用是在早课前。', contact: '李同学 · 站内联系', action: '联系失主' },
+    { icon: '📚', image: './assets/mutual/lost-books.webp', imageAlt: '深蓝色帆布手提书袋', tone: 'lost-books', title: '蓝色帆布书袋', place: '图书馆三层靠窗区', time: '昨天 19:10', status: '失物', description: '袋内有两本专业课教材和一只银色签字笔，已交到图书馆服务台。', contact: '周同学 · 图书馆服务台', action: '联系失主' },
+    { icon: '🎧', image: './assets/mutual/lost-headphones.webp', imageAlt: '浅色桌面上的白色无线耳机盒', tone: 'lost-headphones', title: '白色无线耳机盒', place: '世纪馆报告厅外', time: '9 月 16 日 16:30', status: '寻物', description: '透明保护壳上贴着一颗小树贴纸，希望有拾到的同学帮忙留意。', contact: '陈同学 · 站内联系', action: '联系发布者' },
   ],
   闲置流转: [
-    { image: './assets/mutual/idle-chair.webp', imageAlt: '放着书本的木质折叠椅', tone: 'idle-chair', title: '宿舍折叠椅', price: '25 元', condition: '九成新', place: '品园一舍附近', time: '今天 10:15', description: '靠背和坐垫都保持良好，毕业离校前转出，支持现场查看。', contact: '王同学 · 站内联系', action: '联系发布者' },
-    { image: './assets/mutual/idle-study-books.webp', imageAlt: '书桌上的英语学习资料和笔记本电脑', tone: 'idle-books', title: '考研英语资料一套', price: '免费', condition: '八成新', place: '北区食堂门口', time: '昨天 21:00', description: '包含单词书、真题册和笔记，适合刚开始准备英语复习的同学。', contact: '赵同学 · 可约取件', action: '联系发布者' },
-    { image: './assets/mutual/idle-monitor.webp', imageAlt: '书桌上的 24 英寸显示器', tone: 'idle-monitor', title: '24 英寸显示器', price: '180 元', condition: '九成新', place: '知行楼一层', time: '9 月 15 日', description: '1080p 分辨率，接口齐全，已恢复出厂设置，可现场通电检查。', contact: '高同学 · 站内联系', action: '联系发布者' },
+    { icon: '🪑', image: './assets/mutual/idle-chair.webp', imageAlt: '展开摆放的绿色折叠椅', tone: 'idle-chair', title: '宿舍折叠椅', price: '25 元', condition: '九成新', place: '品园一舍附近', time: '今天 10:15', description: '靠背和坐垫都保持良好，毕业离校前转出，支持现场查看。', contact: '王同学 · 站内联系', action: '联系发布者' },
+    { icon: '📖', image: './assets/mutual/idle-books.webp', imageAlt: '书桌上整齐摆放的书籍和学习用品', tone: 'idle-books', title: '考研英语资料一套', price: '免费', condition: '八成新', place: '北区食堂门口', time: '昨天 21:00', description: '包含单词书、真题册和笔记，适合刚开始准备英语复习的同学。', contact: '赵同学 · 可约取件', action: '联系发布者' },
+    { icon: '🖥️', image: './assets/mutual/idle-monitor.webp', imageAlt: '书桌上的电脑显示器和键盘', tone: 'idle-monitor', title: '24 英寸显示器', price: '180 元', condition: '九成新', place: '知行楼一层', time: '9 月 15 日', description: '1080p 分辨率，接口齐全，已恢复出厂设置，可现场通电检查。', contact: '高同学 · 站内联系', action: '联系发布者' },
   ],
   拼行组队: [
-    { image: './assets/mutual/ride-train.webp', imageAlt: '高铁列车停靠在车站站台', tone: 'ride-train', title: '周末回济南，找两位同行', from: '中国人民大学', to: '济南西站', departure: '9 月 20 日 周六 13:30', remaining: '还差 2 人', transport: '高铁 · 费用 AA', contact: '许同学', description: '计划从学校一起出发到北京南站，路上可以互相照应。' },
-    { image: './assets/mutual/ride-airport-taxi.webp', imageAlt: '机场出发层等候乘客的出租车', tone: 'ride-taxi', title: '机场线拼车，周一早上出发', from: '海淀校区东门', to: '首都机场 T3', departure: '9 月 22 日 周一 06:20', remaining: '还差 1 人', transport: '网约车 · 预计 35 元/人', contact: '林同学', description: '已预约 6 座车，途经中关村和望京，行李较多的同学优先。' },
-    { image: './assets/mutual/ride-campus-bike.webp', imageAlt: '大学校园道路上的骑行学生', tone: 'ride-bike', title: '校园东区到西区，一起骑行', from: '品园南门', to: '世纪馆广场', departure: '今天 17:40', remaining: '还差 3 人', transport: '自行车 · 无费用', contact: '苏同学', description: '下课后顺路同行，节奏较慢，预计 20 分钟到达。' },
+    { icon: '🚄', image: './assets/mutual/ride-train.webp', imageAlt: '停靠在站台的中国高速列车', tone: 'ride-train', title: '周末回济南，找两位同行', from: '中国人民大学', to: '济南西站', departure: '9 月 20 日 周六 13:30', remaining: '还差 2 人', transport: '高铁 · 费用 AA', contact: '许同学', description: '计划从学校一起出发到北京南站，路上可以互相照应。' },
+    { icon: '🚕', image: './assets/mutual/ride-taxi.webp', imageAlt: '道路上行驶的蓝白色出租车', tone: 'ride-taxi', title: '机场线拼车，周一早上出发', from: '海淀校区东门', to: '首都机场 T3', departure: '9 月 22 日 周一 06:20', remaining: '还差 1 人', transport: '网约车 · 预计 35 元/人', contact: '林同学', description: '已预约 6 座车，途经中关村和望京，行李较多的同学优先。' },
+    { icon: '🚲', image: './assets/mutual/ride-bike.webp', imageAlt: '校园道路上结伴骑行的学生', tone: 'ride-bike', title: '校园东区到西区，一起骑行', from: '品园南门', to: '世纪馆广场', departure: '今天 17:40', remaining: '还差 3 人', transport: '自行车 · 无费用', contact: '苏同学', description: '下课后顺路同行，节奏较慢，预计 20 分钟到达。' },
   ],
 };
 
@@ -849,7 +957,7 @@ function openMutualDetail(item, category) {
   const info = isRide
     ? `<div class="mutual-detail-info"><span>出发地<b>${item.from}</b></span><span>目的地<b>${item.to}</b></span><span>出发时间<b>${item.departure}</b></span><span>队伍状态<b>${item.remaining}</b></span></div>`
     : `<div class="mutual-detail-info"><span>${isLost ? '地点' : '价格'}<b>${isLost ? item.place : item.price}</b></span><span>${isLost ? '发现时间' : '物品成色'}<b>${isLost ? item.time : item.condition}</b></span><span>${isLost ? '状态' : '交易地点'}<b>${isLost ? item.status : item.place}</b></span></div>`;
-  layer.innerHTML = `<article class="mutual-detail-card ${isRide ? 'is-ride-detail' : ''}"><button class="mutual-detail-close" type="button" aria-label="关闭详情">×</button><span class="mutual-detail-eyebrow">${category} · 详情</span><div class="mutual-detail-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" decoding="async" /></div><h2>${item.title}</h2>${info}<p>${item.description}</p><div class="mutual-detail-contact"><span>发起人 / 联系方式</span><b>${item.contact}</b></div><div class="mutual-detail-actions"><button class="mutual-detail-primary" type="button">${isRide ? '加入组队' : item.action}</button><button class="mutual-detail-secondary" type="button">☆ 收藏</button></div></article>`;
+  layer.innerHTML = `<article class="mutual-detail-card ${isRide ? 'is-ride-detail' : ''}"><button class="mutual-detail-close" type="button" aria-label="关闭详情">×</button><span class="mutual-detail-eyebrow">${category} · 详情</span><div class="mutual-detail-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" decoding="async"><span aria-hidden="true">${item.icon}</span></div><h2>${item.title}</h2>${info}<p>${item.description}</p><div class="mutual-detail-contact"><span>发起人 / 联系方式</span><b>${item.contact}</b></div><div class="mutual-detail-actions"><button class="mutual-detail-primary" type="button">${isRide ? '加入组队' : item.action}</button><button class="mutual-detail-secondary" type="button">☆ 收藏</button></div></article>`;
   const useDesktopLayer = window.matchMedia('(min-width: 768px)').matches && (category === '失物回家' || category === '闲置流转');
   if (useDesktopLayer) {
     layer.classList.add('is-desktop-layer');
@@ -875,7 +983,7 @@ function openMutualDetail(item, category) {
 function renderMutualCards(category) {
   const items = mutualCardData[category] || [];
   const isRide = category === '拼行组队';
-  resultItems.innerHTML = `<section class="mutual-cards-page ${isRide ? 'is-ride-page' : ''}" aria-label="${category}"><header class="mutual-cards-head"><span class="campus-eyebrow">${category}</span><h2>${category}</h2><p>${isRide ? '把出发时间和同行信息说清楚，轻松找到顺路伙伴。' : category === '失物回家' ? '让遗失的物品回到主人手里。' : '把暂时不用的物品留给真正需要的人。'}</p></header><div class="mutual-card-grid">${items.map((item, index) => `<article class="mutual-card ${isRide ? 'is-ride-card' : ''}" tabindex="0" data-mutual-card="${index}"><div class="mutual-card-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" loading="lazy" decoding="async" /></div><div class="mutual-card-body"><div class="mutual-card-kicker">${isRide ? item.remaining : item.status || item.condition}</div><h3>${item.title}</h3>${isRide ? `<div class="mutual-route"><span>${item.from}</span><b>→</b><span>${item.to}</span></div><p>${item.departure}</p><div class="mutual-card-meta"><span>${item.transport}</span><span>${item.contact}</span></div>` : `<p>${item.place}</p><div class="mutual-card-meta"><span>${item.time || item.price}</span><span>${item.condition || item.status}</span></div>`}</div></article>`).join('')}</div></section>`;
+  resultItems.innerHTML = `<section class="mutual-cards-page ${isRide ? 'is-ride-page' : ''}" aria-label="${category}"><header class="mutual-cards-head"><span class="campus-eyebrow">${category}</span><h2>${category}</h2><p>${isRide ? '把出发时间和同行信息说清楚，轻松找到顺路伙伴。' : category === '失物回家' ? '让遗失的物品回到主人手里。' : '把暂时不用的物品留给真正需要的人。'}</p></header><div class="mutual-card-grid">${items.map((item, index) => `<article class="mutual-card ${isRide ? 'is-ride-card' : ''}" tabindex="0" data-mutual-card="${index}"><div class="mutual-card-art mutual-art-${item.tone}"><img src="${item.image}" alt="${item.imageAlt}" loading="lazy" decoding="async"><span aria-hidden="true">${item.icon}</span></div><div class="mutual-card-body"><div class="mutual-card-kicker">${isRide ? item.remaining : item.status || item.condition}</div><h3>${item.title}</h3>${isRide ? `<div class="mutual-route"><span>${item.from}</span><b>→</b><span>${item.to}</span></div><p>${item.departure}</p><div class="mutual-card-meta"><span>${item.transport}</span><span>${item.contact}</span></div>` : `<p>${item.place}</p><div class="mutual-card-meta"><span>${item.time || item.price}</span><span>${item.condition || item.status}</span></div>`}</div></article>`).join('')}</div></section>`;
   resultItems.hidden = false;
   resultItems.querySelectorAll('[data-mutual-card]').forEach((card) => {
     const item = items[Number(card.dataset.mutualCard)];
@@ -1100,8 +1208,21 @@ function renderSupportResult(category) {
   resultItems.querySelectorAll('.result-detail-actions button').forEach((button) => button.addEventListener('click', (event) => { event.stopPropagation(); showToast(button.classList.contains('result-detail-primary') ? '已发起站内联系（演示）' : '已收藏这条互助信息（演示）'); }));
 }
 
+const campusPhotos = {
+  library: 'https://www.ruc.edu.cn/template/1/out/imgs/sz-img6.jpg',
+  autumnWalk: 'https://images.pexels.com/photos/33327129/pexels-photo-33327129/free-photo-of-university-campus-scene-with-student-walking.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  lecture: 'https://images.pexels.com/photos/8197545/pexels-photo-8197545.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  libraryStudy: 'https://images.pexels.com/photos/16420457/pexels-photo-16420457.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  concert: 'https://images.pexels.com/photos/15509661/pexels-photo-15509661.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  studyLawn: 'https://images.pexels.com/photos/6147274/pexels-photo-6147274.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  studyPair: 'https://images.pexels.com/photos/6147276/pexels-photo-6147276.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  teamStudy: 'https://images.pexels.com/photos/6147071/pexels-photo-6147071.jpeg?auto=compress&cs=tinysrgb&w=1200',
+};
+
+const remotePhoto = (src, alt, className = '') => `<img${className ? ` class="${className}"` : ''} src="${src}" alt="${alt}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
+
 function renderProfilePage() {
-  resultItems.innerHTML = `<section class="profile-page" aria-label="我的个人主页"><header class="profile-cover"><div class="profile-cover-art"></div><div class="profile-identity"><div class="profile-avatar">${avatarMarkup('林予安', '林')}</div><div><h2>林予安</h2><p>英语 2302 · 喜欢摄影、猫和夜跑</p><div class="profile-tags"><span>校园摄影</span><span>音乐</span><span>阅读</span></div></div><button type="button" class="profile-edit">编辑主页</button></div></header><section class="profile-account-panel" aria-label="账户快捷操作"><button type="button" data-profile-account="login"><span>登录账户</span><small>手机号或邮箱登录</small></button><button type="button" data-profile-account="points"><span>我的积分</span><small>查看余额与记录</small></button><button type="button" data-profile-account="settings"><span>设置</span><small>外观、账号与安全</small></button></section><div class="profile-tabs"><button class="is-active" type="button">主页</button><button type="button">我的发布</button><button type="button">收藏</button><button type="button">关注</button><button type="button">连接记录</button></div><div class="profile-grid"><aside class="profile-sidebar"><h3>关于我</h3><p>记录校园里值得停下来的瞬间，也在寻找一起学习和散步的人。</p><div class="profile-stats"><b>24<small>关注</small></b><b>128<small>获赞</small></b><b>16<small>连接</small></b></div></aside><main class="profile-main"><div class="profile-section-head"><span class="campus-eyebrow">FEATURED</span><h3>精选</h3></div><div class="profile-feature-grid"><article class="profile-feature feature-photo"><span>校园摄影</span><h4>雨后的校园</h4></article><article class="profile-feature feature-note"><span>最近的一段经历</span><h4>把路灯下的影子拍下来，发现校园会在夜里变得很温柔。</h4></article><article class="profile-feature feature-collection"><span>收藏的话题</span><h4>期末周图书馆要不要延长开放？</h4></article></div><div class="profile-section-head"><span class="campus-eyebrow">RECENT POSTS</span><h3>最近发布</h3></div><article class="profile-post"><div><span class="campus-eyebrow">校园生活 · 28 分钟前</span><h4>雨后的校园，适合散步也适合发呆</h4><p>下课后绕着湖边走了一圈，发现校园在雨里有另一种安静。</p></div><span class="profile-post-meta">24 ♡　3 ◌</span></article></main><aside class="profile-right"><h3>最近关注</h3><p>周砚 · 摄影</p><p>校园夜跑组 · 运动</p><h3>我的连接</h3><p>四级词汇搭子</p><p>草坪音乐会 · 已参加</p></aside></div></section>`;
+  resultItems.innerHTML = `<section class="profile-page" aria-label="我的个人主页"><header class="profile-cover"><div class="profile-cover-art">${remotePhoto(campusPhotos.library, '校园图书馆与广场')}</div><div class="profile-identity"><div class="profile-avatar">${avatarMarkup('林予安', '林')}</div><div><h2>林予安</h2><p>英语 2302 · 摄影与阅读</p><div class="profile-tags"><span>校园摄影</span><span>夜跑</span><span>阅读</span></div></div><button type="button" class="profile-edit">编辑</button></div></header><section class="profile-account-panel" aria-label="账户快捷操作"><button type="button" data-profile-account="login"><span>账户</span><small>登录与身份</small></button><button type="button" data-profile-account="points"><span>积分</span><small>余额与记录</small></button><button type="button" data-profile-account="settings"><span>设置</span><small>外观与安全</small></button></section><div class="profile-tabs" role="tablist" aria-label="个人内容"><button class="is-active" type="button" role="tab" aria-selected="true">主页</button><button type="button" role="tab">发布</button><button type="button" role="tab">收藏</button><button type="button" role="tab">关注</button></div><div class="profile-grid"><aside class="profile-sidebar"><h3>关于我</h3><p>记录校园里值得停下来的瞬间，也在寻找一起学习和散步的人。</p><div class="profile-stats"><b>24<small>关注</small></b><b>128<small>获赞</small></b><b>16<small>连接</small></b></div></aside><main class="profile-main"><div class="profile-section-head"><span class="campus-eyebrow">FEATURED</span><h3>精选</h3></div><div class="profile-feature-grid"><article class="profile-feature feature-photo">${remotePhoto(campusPhotos.autumnWalk, '秋日校园里行走的学生')}<div><span>校园摄影</span><h4>秋日的校园小路</h4></div></article><article class="profile-feature feature-note">${remotePhoto(campusPhotos.studyLawn, '在校园草地上学习的学生')}<div><span>最近动态</span><h4>草坪上的复习时间</h4></div></article><article class="profile-feature feature-collection">${remotePhoto(campusPhotos.libraryStudy, '在图书馆共同学习的学生')}<div><span>我的收藏</span><h4>图书馆学习清单</h4></div></article></div><div class="profile-section-head"><span class="campus-eyebrow">RECENT</span><h3>最近发布</h3></div><article class="profile-post">${remotePhoto(campusPhotos.studyPair, '校园草地上的学习伙伴', 'profile-post-media')}<div class="profile-post-copy"><span class="campus-eyebrow">校园生活 · 28 分钟前</span><h4>下课后的校园，适合散步也适合发呆</h4><p>绕着草坪走了一圈，发现傍晚有另一种安静。</p><span class="profile-post-meta">24 ♡　3 ◌</span></div></article></main><aside class="profile-right"><h3>最近关注</h3><p>周砚 · 摄影</p><p>校园夜跑组 · 运动</p><h3>我的连接</h3><p>四级词汇搭子</p><p>草坪音乐会 · 已参加</p></aside></div></section>`;
   resultItems.hidden = false;
   resultItems.querySelector('.profile-edit').addEventListener('click',()=>showToast('编辑主页将在下一层接入'));
   resultItems.querySelectorAll('[data-profile-account]').forEach((button) => button.addEventListener('click', () => {
@@ -1885,9 +2006,9 @@ function openResourceDetail(resource) {
   layer.querySelector('.resource-detail-close').focus();
 }
 function setupResourceScroller(scroller) {
-  scroller.addEventListener('wheel', (event) => { if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return; event.preventDefault(); scroller.scrollBy({ left: event.deltaY, behavior: 'smooth' }); }, { passive: false });
+  scroller.addEventListener('wheel', (event) => { if (mobileSearchMedia.matches || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return; event.preventDefault(); scroller.scrollBy({ left: event.deltaY, behavior: 'smooth' }); }, { passive: false });
   let startX = null; let startScroll = 0;
-  scroller.addEventListener('pointerdown', (event) => { if (event.target.closest('button')) { startX = null; return; } startX = event.clientX; startScroll = scroller.scrollLeft; scroller.setPointerCapture?.(event.pointerId); });
+  scroller.addEventListener('pointerdown', (event) => { if (mobileSearchMedia.matches || event.target.closest('button')) { startX = null; return; } startX = event.clientX; startScroll = scroller.scrollLeft; scroller.setPointerCapture?.(event.pointerId); });
   scroller.addEventListener('pointermove', (event) => { if (startX === null) return; scroller.scrollLeft = startScroll - (event.clientX - startX); });
   scroller.addEventListener('pointerup', () => { startX = null; });
   scroller.addEventListener('pointercancel', () => { startX = null; });
@@ -1963,12 +2084,12 @@ function selectRadarNode(id) {
 function renderCampusBoard() {
   resultItems.innerHTML = `<section class="campus-board" aria-label="校园动态编辑部">
     <article class="campus-feature">
-      <div class="campus-feature-art"><span>秋日校园<br><b>开放日</b></span></div>
+      <div class="campus-feature-art">${remotePhoto(campusPhotos.library, '中国人民大学校园图书馆')}<span>秋日校园<br><b>开放日</b></span></div>
       <div class="campus-feature-copy"><span class="campus-eyebrow">主推活动 · 09.18</span><h2>秋日校园开放日：一起逛展、听讲座</h2><p>校史馆、图书馆与世纪馆将开放夜间参观，现场还有学生社团体验。</p><div class="campus-meta"><span>◷ 9 月 18 日 14:00</span><span>⌖ 世纪馆广场</span><button type="button" class="campus-interest">感兴趣</button></div></div>
     </article>
-    <article class="campus-small"><div class="campus-thumb thumb-club">社团<br>招新</div><div><span class="campus-eyebrow">社团消息</span><h3>摄影协会招新开始</h3><p>带上你的相机，认识一起记录校园的人。</p><span class="campus-tag">报名中</span></div></article>
-    <article class="campus-small"><div class="campus-thumb thumb-talk">讲座<br>现场</div><div><span class="campus-eyebrow">讲座 · 09.14</span><h3>从城市到社区：公共空间分享会</h3><p>周六 19:00，图书馆报告厅。</p><span class="campus-tag">可预约</span></div></article>
-    <article class="campus-recap"><div class="recap-collage"><i></i><i></i><i></i><i></i></div><div><span class="campus-eyebrow">活动回顾</span><h3>上周末的草坪音乐会</h3><p>风、晚霞和刚好在场的同学。</p></div></article>
+    <article class="campus-small"><div class="campus-thumb thumb-club">${remotePhoto(campusPhotos.autumnWalk, '秋日校园里的学生')}</div><div><span class="campus-eyebrow">社团消息</span><h3>摄影协会招新开始</h3><p>带上你的相机，认识一起记录校园的人。</p><span class="campus-tag">报名中</span></div></article>
+    <article class="campus-small"><div class="campus-thumb thumb-talk">${remotePhoto(campusPhotos.lecture, '大学讲座中的学生')}</div><div><span class="campus-eyebrow">讲座 · 09.14</span><h3>从城市到社区：公共空间分享会</h3><p>周六 19:00，图书馆报告厅。</p><span class="campus-tag">可预约</span></div></article>
+    <article class="campus-recap"><div class="recap-collage">${remotePhoto(campusPhotos.concert, '户外音乐会现场')}${remotePhoto(campusPhotos.studyLawn, '校园草地上的学习时刻')}${remotePhoto(campusPhotos.studyPair, '一起学习的同学')}${remotePhoto(campusPhotos.teamStudy, '校园里的小组学习')}</div><div><span class="campus-eyebrow">活动回顾</span><h3>上周末的草坪音乐会</h3><p>风、晚霞和刚好在场的同学。</p></div></article>
     <aside class="campus-more"><span class="campus-eyebrow">更多动态</span><h3>校园里还有 24 条新消息</h3><button type="button">查看全部&nbsp; →</button></aside>
   </section>`;
   resultItems.hidden = false;
