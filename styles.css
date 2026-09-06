@@ -1750,7 +1750,7 @@ input:focus-visible {
   border-color: var(--nav-glass-edge);
   border-radius: 0 26px 26px 0;
   box-shadow: 14px 10px 34px rgba(55, 35, 90, 0.1), inset -1px 0 0 rgba(255, 255, 255, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  transition: width 280ms var(--ease), opacity 180ms ease, border-color 240ms ease, box-shadow 240ms ease;
+  transition: width 280ms var(--ease), opacity 180ms ease, border-color 240ms ease, background 240ms ease, box-shadow 240ms ease;
   backdrop-filter: blur(4px) saturate(145%) !important;
   -webkit-backdrop-filter: blur(4px) saturate(145%) !important;
 }
@@ -1975,6 +1975,7 @@ html.pomodoro-focus-open { overflow: hidden; }
   --section-sidebar-width: 220px;
   --section-sidebar-collapsed-width: 58px;
   --section-sidebar-content-gap: 16px;
+  --section-sidebar-hover-intent-delay: 220ms;
 }
 .discovery-layer { padding-left: var(--section-sidebar-width); }
 .learning-library-page { grid-template-columns: var(--section-sidebar-width) minmax(0, 1fr); }
@@ -1989,6 +1990,18 @@ html.pomodoro-focus-open { overflow: hidden; }
     width: var(--section-sidebar-width);
     max-width: var(--section-sidebar-width);
   }
+  /* Only commit mouse hover after a short dwell; keyboard focus remains immediate. */
+  .support-drawer:hover:not(:focus-within) {
+    transition-delay: var(--section-sidebar-hover-intent-delay), 0ms, var(--section-sidebar-hover-intent-delay), var(--section-sidebar-hover-intent-delay), var(--section-sidebar-hover-intent-delay);
+  }
+  .support-drawer:not(:hover) .support-label,
+  .support-drawer:not(:hover) .support-drawer-title {
+    transition-delay: 0ms, 0ms;
+  }
+  .support-drawer:hover:not(:focus-within) .support-label,
+  .support-drawer:hover:not(:focus-within) .support-drawer-title {
+    transition-delay: calc(var(--section-sidebar-hover-intent-delay) + 65ms), calc(var(--section-sidebar-hover-intent-delay) + 45ms);
+  }
   .serp-stage:has(> .support-drawer.is-visible) {
     box-sizing: border-box;
     width: calc(100% + var(--section-sidebar-width));
@@ -2000,6 +2013,12 @@ html.pomodoro-focus-open { overflow: hidden; }
   .serp-stage:has(> .support-drawer.is-visible:hover),
   .serp-stage:has(> .support-drawer.is-visible:focus-within) {
     padding-left: calc(var(--section-sidebar-width) + var(--section-sidebar-content-gap));
+  }
+  .serp-stage:has(> .support-drawer.is-visible:hover:not(:focus-within)) {
+    transition-delay: var(--section-sidebar-hover-intent-delay);
+  }
+  .serp-stage:has(> .support-drawer.is-visible:focus-within) {
+    transition-delay: 0ms;
   }
   .serp-stage:has(> .support-drawer:not(.is-visible)) {
     box-sizing: border-box;
