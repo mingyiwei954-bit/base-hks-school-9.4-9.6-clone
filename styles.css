@@ -2957,6 +2957,146 @@ html.pomodoro-focus-open { overflow: hidden; }
   .canvas .verticals-track { transition: none !important; }
 }
 
+/* 电脑端“我的”：左侧公众主页，右侧个人私页。 */
+@media (min-width: 768px) {
+  .profile-page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto minmax(0, 1fr);
+    width: 100%;
+    overflow: hidden;
+    border: 3px solid rgba(118,82,182,.24);
+    border-radius: 32px;
+    background: rgba(255,254,250,.5);
+    box-shadow: 0 12px 30px rgba(55,35,90,.07);
+  }
+  .profile-cover {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    min-width: 0;
+    border-right: 1px solid rgba(118,82,182,.18);
+    border-bottom-color: rgba(24,49,40,.08);
+  }
+  .profile-cover::before {
+    content: "公众主页";
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    z-index: 2;
+    padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,.58);
+    border-radius: 12px;
+    color: #5e406e;
+    background: rgba(255,255,255,.58);
+    font-size: 16px;
+    font-weight: 750;
+    letter-spacing: .04em;
+  }
+  .profile-cover-art { height: 164px; }
+  .profile-identity { padding: 0 26px 24px; }
+  .profile-identity h2 { font-size: 30px; }
+  .profile-identity p { font-size: 17px; }
+  .profile-tags { flex-wrap: wrap; gap: 8px; }
+  .profile-tags span { padding: 6px 10px; border-radius: 9px; font-size: 15px; }
+  .profile-edit { min-height: 42px; padding: 0 15px; border-width: 2px; border-radius: 14px; font-size: 16px; }
+  .profile-account-panel {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+    padding: 70px 24px 18px;
+    border-bottom: 1px solid rgba(24,49,40,.09);
+    background: rgba(240,235,247,.36);
+  }
+  .profile-account-panel::before {
+    content: "个人私页";
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    color: #573552;
+    font-size: 24px;
+    font-weight: 800;
+  }
+  .profile-account-panel::after {
+    content: "仅自己可见";
+    position: absolute;
+    top: 29px;
+    right: 24px;
+    color: #8b7d88;
+    font-size: 15px;
+    font-weight: 650;
+  }
+  .profile-account-panel button {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    min-height: 78px;
+    padding: 12px 14px;
+    border: 2px solid rgba(118,82,182,.18);
+    border-radius: 17px;
+    color: var(--ink);
+    background: rgba(255,255,255,.5);
+    text-align: left;
+    cursor: pointer;
+  }
+  .profile-account-panel button:hover,
+  .profile-account-panel button:focus-visible { border-color: rgba(118,82,182,.48); background: rgba(255,255,255,.76); outline: none; }
+  .profile-account-panel span { font-size: 18px; font-weight: 760; }
+  .profile-account-panel small { color: #7b8781; font-size: 14px; line-height: 1.4; }
+  .profile-tabs {
+    grid-column: 2;
+    grid-row: 2;
+    gap: 10px;
+    min-width: 0;
+    padding: 13px 24px;
+    overflow-x: auto;
+    border-left: 1px solid rgba(118,82,182,.18);
+    scrollbar-width: none;
+  }
+  .profile-tabs::-webkit-scrollbar { display: none; }
+  .profile-tabs button:first-child { display: none; }
+  .profile-tabs button { flex: 0 0 auto; min-height: 40px; padding: 0 10px; border-radius: 11px; font-size: 16px; white-space: nowrap; }
+  .profile-tabs button:hover,
+  .profile-tabs button:focus-visible { color: #7652b6; background: rgba(118,82,182,.08); outline: none; }
+  .profile-grid { display: contents; }
+  .profile-sidebar { display: none; }
+  .profile-main {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+    padding: 28px;
+    border-right: 1px solid rgba(118,82,182,.18);
+    background: rgba(255,254,250,.42);
+  }
+  .profile-right {
+    grid-column: 2;
+    grid-row: 3;
+    min-width: 0;
+    padding: 28px;
+    color: #66756d;
+    background: rgba(231,239,235,.34);
+    font-size: 18px;
+    line-height: 1.65;
+  }
+  .profile-right h3 { margin: 0 0 12px; font-size: 22px; }
+  .profile-right h3:not(:first-child) { margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(24,49,40,.1); }
+  .profile-right p { margin: 0 0 13px; font-size: 18px; }
+  .profile-section-head h3 { font-size: 22px; }
+  .profile-feature { border-radius: 20px; }
+  .profile-post { gap: 16px; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .profile-account-panel { grid-template-columns: 1fr; padding-top: 68px; }
+  .profile-account-panel button { min-height: 62px; }
+  .profile-feature-grid { grid-template-columns: 1fr; }
+  .profile-tabs { flex-wrap: wrap; }
+}
+
 /* 手机一级栏目改为底部 Tab Bar；二级栏目成为唯一顶部导航。 */
 @media (max-width: 767px) {
   :root { --mobile-tabbar-height: 64px; }
