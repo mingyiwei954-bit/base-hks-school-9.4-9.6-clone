@@ -1970,13 +1970,42 @@ html.pomodoro-focus-open { overflow: hidden; }
 .pomodoro-theme-white .pomodoro-focus-return { color: #000; border-color: #000; }
 @media (max-width: 600px) { .pomodoro-inline-setting { grid-template-columns: 22px 1fr; } .pomodoro-inline-setting small { grid-column: 2; margin-top: -8px; } .pomodoro-slider button { min-width: 108px; } }
 
-/* 综合、互助与学习库统一使用同一宽度的左侧栏；互助仅增加栏目数量。 */
-:root { --section-sidebar-width: 220px; }
+/* 综合、互助与学习库共用侧栏尺寸；桌面端收起后只保留图标轨道。 */
+:root {
+  --section-sidebar-width: 220px;
+  --section-sidebar-collapsed-width: 58px;
+  --section-sidebar-content-gap: 16px;
+}
 .discovery-layer { padding-left: var(--section-sidebar-width); }
-.support-drawer,
-.support-drawer:hover,
-.support-drawer:focus-within { width: var(--section-sidebar-width); max-width: var(--section-sidebar-width); }
 .learning-library-page { grid-template-columns: var(--section-sidebar-width) minmax(0, 1fr); }
+
+@media (min-width: 768px) {
+  .support-drawer {
+    width: var(--section-sidebar-collapsed-width);
+    max-width: var(--section-sidebar-collapsed-width);
+  }
+  .support-drawer:hover,
+  .support-drawer:focus-within {
+    width: var(--section-sidebar-width);
+    max-width: var(--section-sidebar-width);
+  }
+  .serp-stage:has(> .support-drawer.is-visible) {
+    box-sizing: border-box;
+    width: calc(100% + var(--section-sidebar-width));
+    max-width: none;
+    margin-left: calc(-1 * var(--section-sidebar-width));
+    padding-left: calc(var(--section-sidebar-collapsed-width) + var(--section-sidebar-content-gap));
+    transition: padding-left 280ms var(--ease);
+  }
+  .serp-stage:has(> .support-drawer.is-visible:hover),
+  .serp-stage:has(> .support-drawer.is-visible:focus-within) {
+    padding-left: calc(var(--section-sidebar-width) + var(--section-sidebar-content-gap));
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .serp-stage:has(> .support-drawer.is-visible) { transition-duration: 1ms; }
+}
 
 @media (max-width: 767px) {
   .discovery-layer { padding-left: 0; }
