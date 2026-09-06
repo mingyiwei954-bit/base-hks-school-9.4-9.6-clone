@@ -2317,6 +2317,18 @@ html.pomodoro-focus-open { overflow: hidden; }
   }
   .canvas .result-items { width: 100%; max-width: none; margin: 0; }
   .canvas .result-items > * { max-width: 100%; min-width: 0; }
+  .canvas .result-items {
+    transform-origin: 50% 0;
+    transition: opacity 72ms ease-out, transform 72ms ease-out;
+    will-change: opacity, transform;
+  }
+  .canvas .result-items.is-stage-leaving {
+    opacity: .9;
+    transform: translate3d(0, -3px, 0);
+  }
+  .canvas .result-items.is-stage-entering {
+    animation: mobile-page-stage-in 190ms var(--ease) both;
+  }
 
   /* 提前合成手机固定层，避免首次滚动时才创建图层造成短促停顿。 */
   .mobile-subnav,
@@ -2974,4 +2986,9 @@ html.pomodoro-focus-open { overflow: hidden; }
   18% { opacity: .34; }
   68% { opacity: .16; }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes mobile-page-stage-in {
+  from { opacity: .9; transform: translate3d(0, 4px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }

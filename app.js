@@ -680,8 +680,35 @@ function runMobileTabAction(button, event, action) {
   window.setTimeout(() => ripple.remove(), 520);
 }
 
+let mobilePageTransitionToken = 0;
+let mobilePageSwapTimer = 0;
+let mobilePageCleanupTimer = 0;
+
+function runMobilePageTransition(action) {
+  if (!mobileSearchMedia.matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches || resultItems.hidden) {
+    action();
+    return;
+  }
+
+  const token = ++mobilePageTransitionToken;
+  window.clearTimeout(mobilePageSwapTimer);
+  window.clearTimeout(mobilePageCleanupTimer);
+  resultItems.classList.remove('is-stage-entering');
+  resultItems.classList.add('is-stage-leaving');
+
+  mobilePageSwapTimer = window.setTimeout(() => {
+    if (token !== mobilePageTransitionToken) return;
+    action();
+    resultItems.classList.remove('is-stage-leaving');
+    resultItems.classList.add('is-stage-entering');
+    mobilePageCleanupTimer = window.setTimeout(() => {
+      if (token === mobilePageTransitionToken) resultItems.classList.remove('is-stage-entering');
+    }, 210);
+  }, 72);
+}
+
 verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
-  button.addEventListener('click', (event) => runMobileTabAction(button, event, () => selectVertical(button)));
+  button.addEventListener('click', (event) => runMobileTabAction(button, event, () => runMobilePageTransition(() => selectVertical(button))));
   button.addEventListener('keydown', (event) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
@@ -689,7 +716,7 @@ verticalsTrack.querySelectorAll('[data-vertical]').forEach((button) => {
     const current = tabs.indexOf(button);
     const direction = event.key === 'ArrowRight' ? 1 : -1;
     const next = tabs[(current + direction + tabs.length) % tabs.length];
-    selectVertical(next);
+    next.click();
     next.focus();
   });
 });
@@ -852,7 +879,7 @@ if (mobileSubnavTrack) setupMobileSubnavDrag(mobileSubnavTrack);
 mobileSubnavTrack?.addEventListener('click', (event) => {
   const button = event.target.closest('[data-mobile-section]');
   if (!button) return;
-  runMobileTabAction(button, event, () => {
+  runMobileTabAction(button, event, () => runMobilePageTransition(() => {
     const value = button.dataset.mobileSection;
     if (activeVertical === '工具箱') {
       toolboxActiveTab = value;
@@ -864,7 +891,7 @@ mobileSubnavTrack?.addEventListener('click', (event) => {
       saveSidebarState();
       renderSupportResult(value);
     }
-  });
+  }));
 });
 
 mobileSubnavTrack?.addEventListener('keydown', (event) => {
